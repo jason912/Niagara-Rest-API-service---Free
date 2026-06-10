@@ -1,5 +1,6 @@
-# Niagara-Rest-API-service---Free
-# Niagara REST API — Verified Capabilities & Competitive Advantages
+# Niagara-Rest-API-service
+# Niagara REST API — Verified Capabilities & Competitive Advantages 
+A toolkit designed for AI-powered automation of Niagara programming.
 
 > **Test stations:** IOT_Test (N4.14 @ 192.168.2.112:8081) — *tested live 2026-06-10 13:28 CST*  
 > **Module:** niagaraRestApi v1.0.1.4.14  
