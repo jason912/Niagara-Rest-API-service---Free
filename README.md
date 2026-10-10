@@ -4,7 +4,26 @@
 [![License: Free](https://img.shields.io/badge/License-Free-brightgreen)](LICENSE)
 [![Contact](https://img.shields.io/badge/Contact-WhatsApp-brightgreen)](https://wa.me/8613801909968)
 
-> **Passwordless REST API for Niagara 4 — batch operations, deep copy, link-safe rename, and full component lifecycle. Built for AI automation.**
+> **REST API for Niagara 4 — batch operations, deep copy, link-safe rename, and full component lifecycle. Built for AI automation.**
+>
+> **Two editions:** v1 (passwordless, free) · **v2 (built-in security, BQL, program management — available on request)**
+
+---
+
+## Two Editions
+
+| | **v1 · niagaraRestApi** | **v2 · glineRestApi** |
+|:--|:--|:--|
+| **Availability** | ✅ In this repo | 🔒 **On request** |
+| **Authentication** | — | ✅ Basic Auth |
+| **Access Control** | — | ✅ CIDR allow-list |
+| **BQL Query** | — | ✅ Structured JSON tables |
+| **Program Management** | — | ✅ Create / addslot / write / status |
+| **Batch Operations** | ✅ | ✅ |
+| **Component Lifecycle** | ✅ | ✅ |
+| **Port** | 8081 | 8082 |
+
+Both editions are **independent modules** and can run side by side.
 
 ---
 
@@ -17,6 +36,48 @@ Designed for:
 - **CI/CD pipelines** for station deployment
 - **Bulk point creation** during commissioning
 - **Template-based station cloning**
+
+---
+
+## What's New in v2
+
+v2 keeps everything that made v1 useful, and adds a complete **security and query layer**.
+
+### 🔐 Built-in Security
+
+- **Basic Auth** — username + password, configurable at runtime
+- **CIDR allow-list** — restrict access to trusted network segments
+- Configuration persists across restarts — no external reverse proxy required
+
+### 📊 BQL Query
+
+Run BQL directly over HTTP and receive **structured JSON tables** — columns, rows, and count. Ready for reports, dashboards, and AI data pipelines.
+
+### ⚙️ Program Management
+
+Create programs, add slots, write source, and read status — all through the API.
+
+### 📦 Everything from v1, Improved
+
+All 10 batch operations remain, plus BQL as operation #11.
+
+---
+
+## Getting v2
+
+**v2 is distributed on request** so we can match you with the right build and support.
+
+Send us:
+
+| Info | Example |
+|:--|:--|
+| Niagara version | 4.14 / 4.15 |
+| Intended use | AI automation / commissioning / integration |
+| Organization | (optional) |
+
+**Contact:** [WhatsApp +86 138 0199 0968](https://wa.me/8613801909968) · [jason.zhang@gline-net.com](mailto:jason.zhang@gline-net.com)
+
+We will send the latest build (`glineRestApi-rt.jar`) with installation notes.
 
 ---
 
@@ -52,6 +113,7 @@ curl -X POST http://your-station:8081/api/batch \
 | 8 | **READ** | Read | Read component info or a specific property |
 | 9 | **LIST** | List | List all immediate child components |
 | 10 | **INVOKE** | Call Action | Invoke any Niagara action (ping, set, enable/disable) |
+| 11 | **BQL** | Query *(v2)* | Run BQL, return structured table |
 
 ---
 
@@ -65,6 +127,8 @@ curl -X POST http://your-station:8081/api/batch \
 | Full lifecycle (7 operations) | ✅ | ❌ | ❌ | ❌ |
 | No SMA required | ✅ | ✅ | ✅ | ❌ |
 | Single .jar deployment | ✅ | built-in | .jar | built-in |
+| Built-in auth *(v2)* | ✅ | ✅ | ❌ | ✅ |
+| BQL to JSON table *(v2)* | ✅ | ❌ | ❌ | ❌ |
 
 ---
 
@@ -129,8 +193,8 @@ Complete lifecycle verified end-to-end. UNLINK correctly removes the Link child;
 |-----------|-------------|
 | **Niagara** | 4.14 or later |
 | **License** | None required |
-| **Auth** | None (internal LAN) — wrap with nginx for production |
-| **Port** | 8081 (configurable) |
+| **Auth** | v1: none (internal LAN) · **v2: built-in Basic Auth** |
+| **Port** | 8081 (v1) · 8082 (v2) |
 
 ---
 
@@ -140,6 +204,7 @@ Complete lifecycle verified end-to-end. UNLINK correctly removes the Link child;
 |--------|-------------|
 | [REST API Guide](docs/Niagara_REST_API_Guide.pdf) | Complete API reference |
 | [API Comparison](docs/Niagara_API_Comparison_English.pdf) | Gline REST vs oBIX vs BTIB vs Tridium |
+| [v2 Test Report](docs/glineRestApi-v2-Test-Report.md) | v2 — 40/40 use cases passed |
 
 ---
 
