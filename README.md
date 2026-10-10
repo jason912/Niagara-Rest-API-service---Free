@@ -63,11 +63,41 @@ v2 keeps everything that made v1 useful, and adds a complete **security and quer
 
 In short: **v2 = v1 + authentication + access control + BQL + program management.**
 
-**In detail:**
+**In detail — the four things v1 cannot do:**
 
-- **Security** — Basic Auth (username + password, configurable at runtime) plus a CIDR allow-list to restrict access to trusted network segments. Configuration persists across restarts, so no external reverse proxy is required.
-- **BQL Query** — run BQL directly over HTTP and receive **structured JSON tables** with columns, rows, and count — ready for reports, dashboards, and AI data pipelines.
-- **Program Management** — create programs, add slots, write source, and read status, all through the API.
+#### 🆕 BQL Query (v2 only)
+
+Run BQL directly over HTTP and receive **structured JSON tables** with columns, rows, and count — ready for reports, dashboards, and AI data pipelines.
+
+```bash
+curl -u "<USER>:<PASS>" -X POST http://your-station:8082/api/batch \
+  -H "Content-Type: application/json" \
+  -d '[{"OP":"bql","Q":"select * from control:NumericWritable"}]'
+```
+
+```json
+[{"OP":"bql","columns":["slotPath","out"],"rows":[...],"count":100,"status":"ok"}]
+```
+
+> On **v1**, the same request returns `{"OP":"bql","status":"unknown"}` — BQL is a v2 feature. Verified live on both ports.
+
+#### 🆕 Program Management (v2 only)
+
+Create programs, add slots, write source, and read status — all through the API. On **v1** these endpoints do not exist (HTTP `404`).
+
+| Endpoint | Method | Purpose |
+|:--|:--|:--|
+| `/api/program/write` | POST | Write program source |
+| `/api/program/addslot` | POST | Add a program slot |
+| `/api/program/status` | GET | Read class, status, checksum, source length |
+
+#### 🆕 Built-in Security (v2 only)
+
+Basic Auth (username + password, configurable at runtime) plus a CIDR allow-list to restrict access to trusted network segments. Configuration persists across restarts, so no external reverse proxy is required. **v1 has no authentication layer.**
+
+#### 🆕 Access-control hardening (v2 only)
+
+Missing or wrong credentials are rejected with **HTTP 401**; requests from outside the allow-list are rejected with **HTTP 403**.
 
 ---
 
