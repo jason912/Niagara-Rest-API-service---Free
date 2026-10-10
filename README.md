@@ -30,7 +30,7 @@ Both editions are **independent modules** and can run side by side.
 
 ## What Is It?
 
-A lightweight REST API module for Niagara N4 stations. **v1** exposes a JSON-over-HTTP endpoint for **10 batch operations** — create, read, update, delete, copy, rename, link, unlink, list, and invoke — all through a single `POST /api/batch` call, with no authentication layer for fast internal use.
+A lightweight REST API module for Niagara N4 stations. **v1** exposes a JSON-over-HTTP endpoint for **11 batch operations** — create, read, update, delete, copy, rename, duplicate, link, unlink, list, and invoke — all through a single `POST /api/batch` call, with no authentication layer for fast internal use.
 
 **v2** adds a mandatory authentication layer plus query and program-management capabilities, for deployments that require controlled access.
 
@@ -48,7 +48,7 @@ v2 keeps everything that made v1 useful, and adds a complete **security and quer
 
 | Capability | v1 · niagaraRestApi | v2 · glineRestApi |
 |:--|:--:|:--:|
-| 10 batch operations (ADD / LINK / RENAME / DUPLICATE / CP / MOD / UNLINK / REMOVE / READ / LIST / INVOKE) | ✅ | ✅ |
+| 11 batch operations (ADD / LINK / RENAME / DUPLICATE / CP / MOD / UNLINK / REMOVE / READ / LIST / INVOKE) | ✅ | ✅ |
 | **Basic Auth on every request** | ❌ | ✅ |
 | **CIDR allow-list (network segment control)** | ❌ | ✅ |
 | **Config persistence across restart** | — | ✅ |
@@ -115,22 +115,26 @@ curl -u "USER:PASS" -X POST http://your-station:8082/api/batch \
 
 ---
 
-## 10 Verified Batch Operations
+## 40 Verified Test Cases
+
+**40 / 40 passed** — 29 functional + 11 access-control cases, executed live with credentials.
+The table below lists the **batch operations** exercised (11 OPs), all reachable through a single `POST /api/batch`.
+The remaining cases cover endpoints, error handling, program management, and access control — see [Test Results](#v2-test-results).
 
 | # | OP | Name | Description |
 |:--|:---|------|-------------|
 | 1 | **ADD** | Create | Create any component type (Folder, Writable points, ModbusTcpDevice, proxyExt, etc.) |
 | 2 | **LINK** | Connect | Create BConversionLink between slots with auto type conversion |
 | 3 | **RENAME** | Rename | Rename components while preserving all handle-based link ORDs |
-| 3b | **DUPLICATE** | Duplicate | Same as CP, auto-generates `{name}_copy` suffix |
-| 4 | **CP** | Deep Copy | Recursive deep copy; internal links rebuilt automatically |
-| 5 | **MOD** | Modify | Write string, integer, boolean, and FlexAddress property values |
-| 6 | **UNLINK** | Disconnect | Remove the Link child component from target point |
-| 7 | **REMOVE** | Delete | Permanently remove a component |
-| 8 | **READ** | Read | Read component info or a specific property |
-| 9 | **LIST** | List | List all immediate child components |
-| 10 | **INVOKE** | Call Action | Invoke any Niagara action (ping, set, enable/disable) |
-| 11 | **BQL** | Query *(v2)* | Run BQL, return structured table |
+| 4 | **DUPLICATE** | Duplicate | Same as CP, auto-generates `{name}_copy` suffix |
+| 5 | **CP** | Deep Copy | Recursive deep copy; internal links rebuilt automatically |
+| 6 | **MOD** | Modify | Write string, integer, boolean, and FlexAddress property values |
+| 7 | **UNLINK** | Disconnect | Remove the Link child component from target point |
+| 8 | **REMOVE** | Delete | Permanently remove a component |
+| 9 | **READ** | Read | Read component info or a specific property |
+| 10 | **LIST** | List | List all immediate child components |
+| 11 | **INVOKE** | Call Action | Invoke any Niagara action (ping, set, enable/disable) |
+| 12 | **BQL** | Query *(v2)* | Run BQL, return structured table |
 
 ---
 
@@ -138,7 +142,7 @@ curl -u "USER:PASS" -X POST http://your-station:8082/api/batch \
 
 | Feature | Gline REST | oBIX | BTIB ACTIVE-API | Tridium /rest/ |
 |---------|:----------:|:----:|:---------------:|:--------------:|
-| Atomic batch (10 ops, single POST) | ✅ | ❌ | ❌ | ❌ |
+| Atomic batch (11 ops, single POST) | ✅ | ❌ | ❌ | ❌ |
 | Deep Copy + link rebuild | ✅ | ❌ | ❌ | ❌ |
 | Rename preserves links | ✅ | ❌ | ❌ | ❌ |
 | Full lifecycle (7 operations) | ✅ | ❌ | ❌ | ❌ |
