@@ -6,7 +6,7 @@
 
 > **REST API for Niagara 4 — batch operations, deep copy, link-safe rename, and full component lifecycle. Built for AI automation.**
 >
-> **Two editions:** v1 (passwordless, free) · **v2 (built-in security, BQL, program management — available on request)**
+> **Two editions:** **v1 · niagaraRestApi** (lightweight, no auth, free) · **v2 · glineRestApi** (built-in authentication, BQL, program management — available on request)
 
 ---
 
@@ -15,7 +15,7 @@
 | | **v1 · niagaraRestApi** | **v2 · glineRestApi** |
 |:--|:--|:--|
 | **Availability** | ✅ In this repo | 🔒 **On request** |
-| **Authentication** | — | ✅ Basic Auth |
+| **Authentication** | None | ✅ Basic Auth (required) |
 | **Access Control** | — | ✅ CIDR allow-list |
 | **BQL Query** | — | ✅ Structured JSON tables |
 | **Program Management** | — | ✅ Create / addslot / write / status |
@@ -29,7 +29,9 @@ Both editions are **independent modules** and can run side by side.
 
 ## What Is It?
 
-A lightweight, no-auth REST API module for Niagarax N4 stations. Expose a JSON-over-HTTP endpoint for **10 batch operations** — create, read, update, delete, copy, rename, link, unlink, list, and invoke — all through a single `POST /api/batch` call.
+A lightweight REST API module for Niagara N4 stations. **v1** exposes a JSON-over-HTTP endpoint for **10 batch operations** — create, read, update, delete, copy, rename, link, unlink, list, and invoke — all through a single `POST /api/batch` call, with no authentication layer for fast internal use.
+
+**v2** adds a mandatory authentication layer plus query and program-management capabilities, for deployments that require controlled access.
 
 Designed for:
 - **AI agents** to programmatically configure Niagara stations
@@ -83,6 +85,8 @@ We will send the latest build (`glineRestApi-rt.jar`) with installation notes.
 
 ## Quick Start
 
+### v1 · niagaraRestApi (in this repo, port 8081)
+
 ```bash
 # 1. Add niagaraRestApi-rt.jar to your modules/ directory
 # 2. Restart station
@@ -94,7 +98,18 @@ curl -X POST http://your-station:8081/api/batch \
   -d '[{"OP":"LIST","PATH":"Drivers"}]'
 ```
 
-> **⚠️ No authentication by default.** For production, wrap with nginx reverse proxy + Basic Auth.
+> **⚠️ v1 carries no authentication.** It is intended for trusted internal networks. For production exposure, wrap it with a reverse proxy, or use **v2**, which enforces authentication in the module itself.
+
+### v2 · glineRestApi (on request, port 8082)
+
+```bash
+# Every request is authenticated:
+curl -u "USER:PASS" -X POST http://your-station:8082/api/batch \
+  -H "Content-Type: application/json" \
+  -d '[{"OP":"LIST","PATH":"Drivers"}]'
+```
+
+> **v2 requires authentication on every request** (Basic Auth + optional CIDR allow-list), configurable in the station.
 
 ---
 
