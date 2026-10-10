@@ -117,9 +117,40 @@ curl -u "USER:PASS" -X POST http://your-station:8082/api/batch \
 
 ## 40 Verified Test Cases
 
-**40 / 40 passed** — 29 functional + 11 access-control cases, executed live with credentials.
-The table below lists the **batch operations** exercised (11 OPs), all reachable through a single `POST /api/batch`.
-The remaining cases cover endpoints, error handling, program management, and access control — see [Test Results](#v2-test-results).
+**40 / 40 passed — 100% pass rate.** Executed live against a Niagara 4.14 station with authentication enabled. Every request carries credentials (`-u "<USER>:<PASS>"`).
+
+| Category | Cases | Passed |
+|:--|:--:|:--:|
+| Functional | 29 | 29 |
+| Access Control | 11 | 11 |
+| **Total** | **40** | **40** |
+
+Full report: [docs/glineRestApi-v2-Test-Report.md](docs/glineRestApi-v2-Test-Report.md)
+
+### Functional cases (29)
+
+| Group | # | Cases |
+|:--|:--:|:--|
+| **Endpoints** | 5 | Service status · Module info · Type query · Browse empty path · Browse with content |
+| **Components** | 8 | Create folder · Create numeric point · Create string point · List children · Modify property · Read property · Rename · Copy |
+| **Links** | 3 | Create link · Verify value propagation · Remove link |
+| **Actions & Query** | 4 | Invoke action · BQL query (live data) · BQL query (component list) · Multiple operations in one request |
+| **Delete** | 1 | Delete a component |
+| **Error handling** | 4 | Non-existent path · Invalid type · Unknown operation · Method not allowed |
+| **Program management** | 4 | Create program · Add program slot · Write program source · Read program status |
+| | **29** | |
+
+### Access-control cases (11)
+
+| Group | # | Cases |
+|:--|:--:|:--|
+| **Baseline / toggle** | 4 | No auth configured · Auth disabled → allowed · `/api/status` without credentials · `/api/status` with credentials |
+| **Basic Auth** | 4 | No credentials → 401 · Wrong password → 401 · Wrong username → 401 · Correct credentials → 200 |
+| **CIDR allow-list** | 2 | Source outside list → 403 · Source inside list → 200 |
+| **Persistence** | 1 | Configuration retained across restart |
+| | **11** | |
+
+### Batch operations (11 OPs, all via `POST /api/batch`)
 
 | # | OP | Name | Description |
 |:--|:---|------|-------------|
@@ -136,6 +167,8 @@ The remaining cases cover endpoints, error handling, program management, and acc
 | 11 | **INVOKE** | Call Action | Invoke any Niagara action (ping, set, enable/disable) |
 | 12 | **BQL** | Query *(v2)* | Run BQL, return structured table |
 
+> `POST /api/program/compile` is not counted above: it is access-controlled like every other endpoint, and its functional use is outside this test set.
+
 ---
 
 ## Competitive Advantages
@@ -145,7 +178,7 @@ The remaining cases cover endpoints, error handling, program management, and acc
 | Atomic batch (11 ops, single POST) | ✅ | ❌ | ❌ | ❌ |
 | Deep Copy + link rebuild | ✅ | ❌ | ❌ | ❌ |
 | Rename preserves links | ✅ | ❌ | ❌ | ❌ |
-| Full lifecycle (7 operations) | ✅ | ❌ | ❌ | ❌ |
+| Full component lifecycle (create → modify → link → rename → copy → delete) | ✅ | ❌ | ❌ | ❌ |
 | No SMA required | ✅ | ✅ | ✅ | ❌ |
 | Single .jar deployment | ✅ | built-in | .jar | built-in |
 | Built-in auth *(v2)* | ✅ | ✅ | ❌ | ✅ |
@@ -164,44 +197,6 @@ The remaining cases cover endpoints, error handling, program management, and acc
 | Production security | **v2** (built-in Basic Auth + CIDR allow-list) — no reverse proxy needed |
 
 **Bottom line:** Gline REST API + oBIX = full station management (component lifecycle + alarm + history) at zero license cost.
-
----
-
-## v2 Test Results
-
-**40 / 40 use cases passed — 100% pass rate**, executed against a live station with authentication enabled.
-
-| Category | Cases | Passed |
-|:--|:--:|:--:|
-| Functional | 29 | 29 |
-| Access Control | 11 | 11 |
-| **Total** | **40** | **40** |
-
-> Every request in the report carries credentials (`-u "<USER>:<PASS>"`).
-> Full report: [docs/glineRestApi-v2-Test-Report.md](docs/glineRestApi-v2-Test-Report.md)
-
-### Functional coverage (29)
-
-| Group | Cases | What was verified |
-|:--|:--|:--|
-| **Components** | 8 | Create Folder / Numeric point / String point · List children · Read & write properties · Rename · Copy |
-| **Links** | 3 | Create link · Verify value propagation through the link · Unlink |
-| **Actions & Query** | 3 | Invoke action (`ping` / `set`) · **BQL query → JSON table** · Multi-operation single request |
-| **Delete & Browse** | 4 | Delete component · Service status · Module info · Type query · Browse station tree |
-| **Error handling** | 4 | Non-existent path · Invalid type · Unknown operation · Method not allowed |
-| **Program management** | 3 | Write program source · Add program slot · Read program status |
-| **Batch** | — | Multi-op ordering within one `POST /api/batch` |
-
-### Access-control coverage (11)
-
-| Case | Expected | Result |
-|:--|:--|:--|
-| No credentials | Rejected (401) | ✅ |
-| Wrong password | Rejected (401) | ✅ |
-| Wrong username | Rejected (401) | ✅ |
-| Correct credentials | Accepted (200) | ✅ |
-| CIDR allow-list enforcement | Blocked / allowed per segment | ✅ |
-| Config persistence across restart | Retained | ✅ |
 
 ---
 
