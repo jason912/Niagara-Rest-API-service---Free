@@ -41,27 +41,28 @@ Designed for:
 
 ---
 
-## What's New in v2
+## What's New in v2 (vs. v1)
 
 v2 keeps everything that made v1 useful, and adds a complete **security and query layer**.
 
-### 🔐 Built-in Security
+| Capability | v1 · niagaraRestApi | v2 · glineRestApi |
+|:--|:--:|:--:|
+| 10 batch operations (ADD / LINK / RENAME / DUPLICATE / CP / MOD / UNLINK / REMOVE / READ / LIST / INVOKE) | ✅ | ✅ |
+| **Basic Auth on every request** | ❌ | ✅ |
+| **CIDR allow-list (network segment control)** | ❌ | ✅ |
+| **Config persistence across restart** | — | ✅ |
+| **BQL query → structured JSON table** | ❌ | ✅ |
+| **Program management (write / addslot / status)** | ❌ | ✅ |
+| **Access-control hardening (401 on bad credentials)** | ❌ | ✅ |
+| Port | 8081 | 8082 |
 
-- **Basic Auth** — username + password, configurable at runtime
-- **CIDR allow-list** — restrict access to trusted network segments
-- Configuration persists across restarts — no external reverse proxy required
+In short: **v2 = v1 + authentication + access control + BQL + program management.**
 
-### 📊 BQL Query
+**In detail:**
 
-Run BQL directly over HTTP and receive **structured JSON tables** — columns, rows, and count. Ready for reports, dashboards, and AI data pipelines.
-
-### ⚙️ Program Management
-
-Create programs, add slots, write source, and read status — all through the API.
-
-### 📦 Everything from v1, Improved
-
-All 10 batch operations remain, plus BQL as operation #11.
+- **Security** — Basic Auth (username + password, configurable at runtime) plus a CIDR allow-list to restrict access to trusted network segments. Configuration persists across restarts, so no external reverse proxy is required.
+- **BQL Query** — run BQL directly over HTTP and receive **structured JSON tables** with columns, rows, and count — ready for reports, dashboards, and AI data pipelines.
+- **Program Management** — create programs, add slots, write source, and read status, all through the API.
 
 ---
 
@@ -155,50 +156,47 @@ curl -u "USER:PASS" -X POST http://your-station:8082/api/batch \
 | Alarm query and acknowledgement | **oBIX** (built-in) |
 | Historical trend data | **oBIX** (HistoryService) |
 | External API data ingestion | **BTIB RestNetwork** |
-| Production security | **nginx + Basic Auth** + Gline REST |
+| Production security | **v2** (built-in Basic Auth + CIDR allow-list) — no reverse proxy needed |
 
 **Bottom line:** Gline REST API + oBIX = full station management (component lifecycle + alarm + history) at zero license cost.
 
 ---
 
-## Verified Test Cases
+## v2 Test Results
 
-### Test 1: Batch ADD — Modbus TCP Device (T8600 Thermostat)
+**40 / 40 use cases passed — 100% pass rate**, executed against a live station with authentication enabled.
 
-Single POST batch creates a ModbusTcpDevice + 3 NumericWritable points + proxyExt for each, configures dataAddress with `addr|decimal` format, and calls `ping` to verify connectivity.
+| Category | Cases | Passed |
+|:--|:--:|:--:|
+| Functional | 29 | 29 |
+| Access Control | 11 | 11 |
+| **Total** | **40** | **40** |
 
-### Test 2: Batch ADD + LINK — MQTT Point Deployment
+> Every request in the report carries credentials (`-u "<USER>:<PASS>"`).
+> Full report: [docs/glineRestApi-v2-Test-Report.md](docs/glineRestApi-v2-Test-Report.md)
 
-Creates 10 BooleanWritable points under an MQTT folder with LINK connections to MqttClient `in10` input — all in a single POST request.
+### Functional coverage (29)
 
-### Test 3: ADD + LINK + RENAME — Link Preservation
+| Group | Cases | What was verified |
+|:--|:--|:--|
+| **Components** | 8 | Create Folder / Numeric point / String point · List children · Read & write properties · Rename · Copy |
+| **Links** | 3 | Create link · Verify value propagation through the link · Unlink |
+| **Actions & Query** | 3 | Invoke action (`ping` / `set`) · **BQL query → JSON table** · Multi-operation single request |
+| **Delete & Browse** | 4 | Delete component · Service status · Module info · Type query · Browse station tree |
+| **Error handling** | 4 | Non-existent path · Invalid type · Unknown operation · Method not allowed |
+| **Program management** | 3 | Write program source · Add program slot · Read program status |
+| **Batch** | — | Multi-op ordering within one `POST /api/batch` |
 
-Link survives rename because Niagarax uses handle-based ORD (`h:xxxxx`), not name-based paths.
+### Access-control coverage (11)
 
-### Test 4: Deep Copy (CP) + Internal Link Rebuild
-
-Copied folder has internal links correctly rebuilt — src→dst mapping fully preserved.
-
-### Test 5: Full Lifecycle (ADD → LINK → UNLINK → REMOVE)
-
-Complete lifecycle verified end-to-end. UNLINK correctly removes the Link child; REMOVE deletes the source without dangling references.
-
-### Test 6: INVOKE — Action Calls
-
-- `ping` on ModbusTcpDevice — connectivity verified
-- `set` on BooleanWritable — value updated correctly
-- Supports `VAL_TYPE`: `num` / `bool` / `str`
-
-### Test 7: MOD — Property Writes
-
-| Property | Type | Value |
-|----------|------|-------|
-| `ipAddress` | String | `"192.168.2.140"` |
-| `port` | Integer | `502` |
-| `enabled` | Boolean | `false` / `true` |
-| `dataAddress` | FlexAddress | `"2|decimal"`, `"0x0A|hex"` |
-
-> ⚠️ Direct MOD on `out` of StringWritable fails (`BString cannot be cast to BStatusString`). Use **INVOKE `set`** for point values.
+| Case | Expected | Result |
+|:--|:--|:--|
+| No credentials | Rejected (401) | ✅ |
+| Wrong password | Rejected (401) | ✅ |
+| Wrong username | Rejected (401) | ✅ |
+| Correct credentials | Accepted (200) | ✅ |
+| CIDR allow-list enforcement | Blocked / allowed per segment | ✅ |
+| Config persistence across restart | Retained | ✅ |
 
 ---
 
@@ -232,6 +230,6 @@ Complete lifecycle verified end-to-end. UNLINK correctly removes the Link child;
 
 ---
 
-> **Disclaimer:** Features verified on Niagarax N4.14.0.162 (<HOST>). Capabilities may vary by station version and configuration.
+> **Disclaimer:** Features verified on Niagara N4.14. Capabilities may vary by station version and configuration.
 
 © 2026 Shanghai Gline Net Co., Ltd. All rights reserved.
