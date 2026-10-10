@@ -2,6 +2,7 @@
 
 [![Niagara 4.14+](https://img.shields.io/badge/Niagara-4.14%2B-blue)](https://www.tridium.com)
 [![License: Free](https://img.shields.io/badge/License-Free-brightgreen)](LICENSE)
+[![Author](https://img.shields.io/badge/Author-jason912-blue)](https://github.com/jason912)
 [![Contact](https://img.shields.io/badge/Contact-WhatsApp-brightgreen)](https://wa.me/8613801909968)
 
 > **REST API for Niagara 4 — batch operations, deep copy, link-safe rename, and full component lifecycle. Built for AI automation.**
@@ -223,6 +224,7 @@ curl -u "USER:PASS" -X POST http://your-station:8082/api/batch \
 
 ## Support & Contact
 
+- **Author**: [@jason912](https://github.com/jason912)
 - **Email**: [jason.zhang@gline-net.com](mailto:jason.zhang@gline-net.com)
 - **WhatsApp**: [+86 138 0199 0968](https://wa.me/8613801909968)
 

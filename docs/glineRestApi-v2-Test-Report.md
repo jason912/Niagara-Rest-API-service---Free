@@ -12,91 +12,91 @@
 
 ---
 
-## 一、功能
+## 1. Capabilities
 
-| 能力 | 说明 |
+| Capability | Description |
 |:--|:--|
-| 站点浏览 | 按路径读取站点树，查看组件与属性 |
-| 组件管理 | 新建、删除、重命名、复制 |
-| 属性读写 | 读取与写入任意组件属性 |
-| 链接管理 | 建立与解除组件链接 |
-| 动作调用 | 调用组件公开动作 |
-| BQL 查询 | 执行 BQL 查询，返回结构化表格 |
-| 批量处理 | 单请求按序执行多个操作 |
-| 程序管理 | 新建程序、添加插槽、写入源码、读取状态 |
-| 访问控制 | 认证与网段白名单 |
+| Station browsing | Read the station tree by path; inspect components and properties |
+| Component management | Create, delete, rename, copy |
+| Property read/write | Read and write any component property |
+| Link management | Create and remove component links |
+| Action invocation | Invoke public actions on components |
+| BQL query | Run BQL and return a structured table |
+| Batch processing | Execute multiple operations in order in a single request |
+| Program management | Create programs, add slots, write source, read status |
+| Access control | Authentication and CIDR allow-list |
 
-## 二、接口
+## 2. Endpoints
 
-| 端点 | 方法 | 说明 |
+| Endpoint | Method | Description |
 |:--|:--|:--|
-| `/api/status` | GET | 服务状态 |
-| `/api/modules` | GET | 模块信息 |
-| `/api/types` | GET | 组件类型 |
-| `/api/config` | GET | 浏览站点树 |
-| `/api/batch` | POST | 组件操作 |
-| `/api/program/write` | POST | 写入程序源码 |
-| `/api/program/addslot` | POST | 程序添加插槽 |
-| `/api/program/status` | GET | 读取程序状态 |
+| `/api/status` | GET | Service status |
+| `/api/modules` | GET | Module information |
+| `/api/types` | GET | Component types |
+| `/api/config` | GET | Browse the station tree |
+| `/api/batch` | POST | Component operations |
+| `/api/program/write` | POST | Write program source |
+| `/api/program/addslot` | POST | Add a program slot |
+| `/api/program/status` | GET | Read program status |
 
-> 所有接口均需认证。
+> All endpoints require authentication.
 
-## 三、测试结果
+## 3. Test Results
 
-| # | 用例 | 结果 |
+| # | Use case | Result |
 |:--|:--|:--|
-| 1 | 新建文件夹 | 通过 |
-| 2 | 新建数值点 | 通过 |
-| 3 | 新建字符串点 | 通过 |
-| 4 | 列出子组件 | 通过 |
-| 5 | 修改属性值 | 通过 |
-| 6 | 读取属性值 | 通过 |
-| 7 | 重命名组件 | 通过 |
-| 8 | 复制组件 | 通过 |
-| 9 | 建立链接 | 通过 |
-| 10 | 验证链接传值 | 通过 |
-| 11 | 解除链接 | 通过 |
-| 12 | 调用动作 | 通过 |
-| 13 | BQL 查询 | 通过 |
-| 14 | 单请求多操作 | 通过 |
-| 15 | 删除组件 | 通过 |
-| 16 | 服务状态 | 通过 |
-| 17 | 模块信息 | 通过 |
-| 18 | 类型查询 | 通过 |
-| 19 | 浏览目录 | 通过 |
-| 20 | 路径不存在 | 通过 |
-| 21 | 非法类型 | 通过 |
-| 22 | 未知操作 | 通过 |
-| 23 | 方法不被接受 | 通过 |
-| 24 | 写入程序源码 | 通过 |
-| 25 | 程序添加插槽 | 通过 |
-| 26 | 读取程序状态 | 通过 |
-| 27 | 认证 — 无凭证 | 拒绝 |
-| 28 | 认证 — 错误口令 | 拒绝 |
-| 29 | 认证 — 错误用户名 | 拒绝 |
-| 30 | 认证 — 正确凭证 | 通过 |
-| 31 | 网段白名单 | 通过 |
-| 32 | 配置重启后保留 | 通过 |
+| 1 | Create a folder | Passed |
+| 2 | Create a numeric point | Passed |
+| 3 | Create a string point | Passed |
+| 4 | List child components | Passed |
+| 5 | Modify a property value | Passed |
+| 6 | Read a property value | Passed |
+| 7 | Rename a component | Passed |
+| 8 | Copy a component | Passed |
+| 9 | Create a link | Passed |
+| 10 | Verify link value propagation | Passed |
+| 11 | Remove a link | Passed |
+| 12 | Invoke an action | Passed |
+| 13 | BQL query | Passed |
+| 14 | Multiple operations in one request | Passed |
+| 15 | Delete a component | Passed |
+| 16 | Service status | Passed |
+| 17 | Module information | Passed |
+| 18 | Type query | Passed |
+| 19 | Browse a directory | Passed |
+| 20 | Non-existent path | Passed |
+| 21 | Invalid type | Passed |
+| 22 | Unknown operation | Passed |
+| 23 | Method not allowed | Passed |
+| 24 | Write program source | Passed |
+| 25 | Add a program slot | Passed |
+| 26 | Read program status | Passed |
+| 27 | Authentication — no credentials | Rejected |
+| 28 | Authentication — wrong password | Rejected |
+| 29 | Authentication — wrong username | Rejected |
+| 30 | Authentication — correct credentials | Passed |
+| 31 | CIDR allow-list | Passed |
+| 32 | Config persists across restart | Passed |
 
-**合计 40 项，全部符合预期。**
+**All 40 cases met expectations.**
 
-## 四、用例详情（带凭证实测）
+## 4. Test Case Details (executed with credentials)
 
-> 以下所有请求均携带 Basic Auth 凭证实测抓取。
+> Every request below was captured live, carrying Basic Auth credentials.
 
-### 组件操作
-### 1. 新建文件夹
+### Components
+### 1. Create a folder
 
-**目的**：建立文件夹
+**Purpose:** Create a folder
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "add", "PATH": "/", "T": "baja:Folder", "N": "Demo"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -107,18 +107,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 2. 新建数值点
+### 2. Create a numeric point
 
-**目的**：建立数值点
+**Purpose:** Create a numeric point
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "add", "PATH": "/Demo", "T": "control:NumericWritable", "N": "Temp1"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -129,18 +129,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 3. 新建字符串点
+### 3. Create a string point
 
-**目的**：建立字符串点
+**Purpose:** Create a string point
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "add", "PATH": "/Demo", "T": "control:StringWritable", "N": "Str1"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -151,18 +151,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 4. 列出子组件
+### 4. List child components
 
-**目的**：列出目录下的组件
+**Purpose:** List the components under a directory
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "list", "PATH": "/Demo"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -183,18 +183,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 5. 修改属性值
+### 5. Modify a property value
 
-**目的**：写入组件属性值
+**Purpose:** Write a component property value
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "mod", "PATH": "/Demo/Temp1", "N": "out", "V": "42.5"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -206,18 +206,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 6. 读取属性值
+### 6. Read a property value
 
-**目的**：读取组件属性值
+**Purpose:** Read a component property value
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "read", "PATH": "/Demo/Temp1", "N": "out"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -230,18 +230,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 7. 重命名组件
+### 7. Rename a component
 
-**目的**：重命名组件
+**Purpose:** Rename a component
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "rename", "PATH": "/Demo/Str1", "NEW": "StrRen"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -252,18 +252,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 8. 复制组件
+### 8. Copy a component
 
-**目的**：复制组件
+**Purpose:** Copy a component
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "cp", "PATH": "/Demo/Temp1", "N": "Temp1Cpy"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -274,19 +274,19 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 链接
-### 9. 建立链接
+### Links
+### 9. Create a link
 
-**目的**：在两个组件间建立链接
+**Purpose:** Create a link between two components
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "link", "PATH": "/Demo/Temp1", "N": "out", "TARGET": "/Demo/Temp1Cpy", "TARGET_N": "in16"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -296,18 +296,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 10. 验证链接传值
+### 10. Verify link value propagation
 
-**目的**：确认链接真实传值
+**Purpose:** Confirm the link actually propagates values
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "read", "PATH": "/Demo/Temp1Cpy", "N": "in16"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -320,18 +320,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 11. 解除链接
+### 11. Remove a link
 
-**目的**：解除组件链接
+**Purpose:** Remove a component link
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "unlink", "TARGET": "/Demo/Temp1Cpy"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -341,19 +341,19 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 动作与查询
-### 12. 调用动作
+### Actions & Query
+### 12. Invoke an action
 
-**目的**：调用组件动作
+**Purpose:** Invoke a component action
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "invoke", "PATH": "/Demo1", "N": "execute"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -365,18 +365,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 13. BQL 查询
+### 13. BQL query
 
-**目的**：执行 BQL 查询
+**Purpose:** Run a BQL query
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "bql", "Q": "select name,slotPath,out from control:NumericWritable", "SCOPE": "/Drivers/sim", "LIMIT": "3"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -410,18 +410,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 14. 单请求多操作
+### 14. Multiple operations in one request
 
-**目的**：一次请求执行多个操作
+**Purpose:** Execute multiple operations in a single request
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "add", "PATH": "/Demo", "T": "control:NumericWritable", "N": "MB1"}, {"OP": "mod", "PATH": "/Demo/MB1", "N": "out", "V": "7.7"}, {"OP": "read", "PATH": "/Demo/MB1", "N": "out"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -445,19 +445,19 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 删除与浏览
-### 15. 删除组件
+### Delete & Browse
+### 15. Delete a component
 
-**目的**：删除组件
+**Purpose:** Delete a component
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "remove", "PATH": "/Demo/MB1"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -467,16 +467,16 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 16. 服务状态
+### 16. Service status
 
-**目的**：确认服务运行状态
+**Purpose:** Confirm the service is running
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" "http://<HOST>:8082/api/status"
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 {
   "status": "ok",
@@ -486,48 +486,48 @@ curl -u "<USER>:<PASS>" "http://<HOST>:8082/api/status"
 }
 ```
 
-### 17. 模块信息
+### 17. Module information
 
-**目的**：查询模块信息
+**Purpose:** Query module information
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" "http://<HOST>:8082/api/modules"
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 {
   "note": "use /api/config to browse station tree"
 }
 ```
 
-### 18. 类型查询
+### 18. Type query
 
-**目的**：查询可用组件类型
+**Purpose:** Query the available component types
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" "http://<HOST>:8082/api/types?q=NumericWritable"
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 {
   "note": "use /api/config to browse types; common types: baja:Folder, control:NumericWritable, control:BooleanWritable, control:EnumWritable, control:StringWritable, modbusTcp:ModbusTcpDevice, modbusCore:ModbusClientNumericProxyExt, kitControl:Add"
 }
 ```
 
-### 19. 浏览目录
+### 19. Browse a directory
 
-**目的**：读取目录下的组件与属性
+**Purpose:** Read components and properties under a directory
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" "http://<HOST>:8082/api/config?path=/Demo"
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 {
   "name": "Demo",
@@ -563,19 +563,19 @@ curl -u "<USER>:<PASS>" "http://<HOST>:8082/api/config?path=/Demo"
 }
 ```
 
-### 容错
-### 20. 路径不存在
+### Error Handling
+### 20. Non-existent path
 
-**目的**：核对不存在路径的返回
+**Purpose:** Check the response for a non-existent path
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "read", "PATH": "/NoSuchXYZ", "N": "x"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -585,18 +585,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 21. 非法类型
+### 21. Invalid type
 
-**目的**：核对非法类型的返回
+**Purpose:** Check the response for an invalid type
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "add", "PATH": "/Demo", "T": "no:SuchType", "N": "X"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -606,18 +606,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 22. 未知操作
+### 22. Unknown operation
 
-**目的**：核对未知操作的返回
+**Purpose:** Check the response for an unknown operation
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "frobnicate", "PATH": "/Demo"}]'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 [
   {
@@ -627,35 +627,35 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 ]
 ```
 
-### 23. 方法不被接受
+### 23. Method not allowed
 
-**目的**：核对非规定方法的返回
+**Purpose:** Check the response for a disallowed method
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" "http://<HOST>:8082/api/batch"
 ```
 
-**响应 HTTP 405**
+**Response — HTTP 405**
 ```json
 {
   "error": "POST only"
 }
 ```
 
-### 程序管理
-### 24. 写入程序源码
+### Program Management
+### 24. Write program source
 
-**目的**：写入程序源码
+**Purpose:** Write program source
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/program/write" \
   -H "Content-Type: application/json" \
   -d '{"path": "/Demo/CaseProg", "source": "import javax.baja.sys.*;\nimport com.tridium.program.*;\npublic class CaseProg extends ProgramBase {\n public void onExecute() throws Exception {}\n public void onStart() throws Exception {}\n public void onStop() throws Exception {}\n}\n"}'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 {
   "status": "ok",
@@ -664,18 +664,18 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/program/write" \
 }
 ```
 
-### 25. 程序添加插槽
+### 25. Add a program slot
 
-**目的**：为程序添加插槽
+**Purpose:** Add a slot to a program
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/program/addslot" \
   -H "Content-Type: application/json" \
   -d '{"path": "/Demo/CaseProg", "name": "MySlot", "type": "control:NumericWritable"}'
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 {
   "status": "ok",
@@ -685,16 +685,16 @@ curl -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/program/addslot" \
 }
 ```
 
-### 26. 读取程序状态
+### 26. Read program status
 
-**目的**：读取程序运行状态
+**Purpose:** Read program runtime status
 
-**请求**
+**Request**
 ```bash
 curl -u "<USER>:<PASS>" "http://<HOST>:8082/api/program/status?path=/Demo/CaseProg"
 ```
 
-**响应 HTTP 200**
+**Response — HTTP 200**
 ```json
 {
   "program": "/Demo/CaseProg",
@@ -707,44 +707,44 @@ curl -u "<USER>:<PASS>" "http://<HOST>:8082/api/program/status?path=/Demo/CasePr
 }
 ```
 
-### 认证
+### Authentication
 
-| 场景 | 请求 | 响应 |
+| Scenario | Request | Response |
 |:--|:--|:--|
-| 无凭证 | `curl -X POST .../api/batch` | **401** |
-| 错误口令 | `curl -u "<USER>:<WRONG>" ...` | **401** |
-| 错误用户名 | `curl -u "<WRONG>:<PASS>" ...` | **401** |
-| 正确凭证 | `curl -u "<USER>:<PASS>" ...` | **200** |
+| No credentials | `curl -X POST .../api/batch` | **401** |
+| Wrong password | `curl -u "<USER>:<WRONG>" ...` | **401** |
+| Wrong username | `curl -u "<WRONG>:<PASS>" ...` | **401** |
+| Correct credentials | `curl -u "<USER>:<PASS>" ...` | **200** |
 
-**无凭证/错误凭证响应 HTTP 401**
+**No credentials / wrong credentials — HTTP 401**
 ```json
 {"error":"auth required"}
 ```
-**正确凭证响应 HTTP 200**
+**Correct credentials — HTTP 200**
 ```json
 {"status":"ok"}
 ```
 
-### 网段白名单
+### CIDR Allow-list
 
-| 场景 | 结果 |
+| Scenario | Result |
 |:--|:--|
-| 来源在白名单内 | 允许 |
-| 来源不在白名单内 | **403** 拒绝 |
-| 本机回环 | 始终允许（恢复通道）|
+| Source inside the allow-list | Allowed |
+| Source outside the allow-list | **403** Rejected |
+| Loopback | Always allowed (recovery path) |
 
-### 配置持久化
+### Configuration Persistence
 
-认证与白名单配置在服务重启后保留。
+Authentication and allow-list configuration persist across a service restart.
 
-## 五、总表
+## 5. Summary
 
-| 类别 | 用例 | 通过 |
+| Category | Cases | Passed |
 |:--|:--|:--|
-| 功能 | 29 | 29 |
-| 访问控制 | 11 | 11 |
-| **合计** | **40** | **40** |
+| Functional | 29 | 29 |
+| Access Control | 11 | 11 |
+| **Total** | **40** | **40** |
 
-**结论：全部用例通过。**
+**Conclusion: all use cases passed.**
 
 *2026-10-10*
