@@ -1,15 +1,16 @@
 # glineRestApi v2 — Test Report
 
-> 40/40 use cases passed. All requests verified with authentication.
-
-# glineRestApi v2 测试报告
-
-| 项目 | 内容 |
+| Item | Detail |
 |:--|:--|
-| 版本 | 2.0.3 |
-| 接口 | HTTP / REST |
-| 认证 | Basic Auth（所有请求均携带凭证）|
-| 测试结果 | 40 / 40 通过（100%）|
+| Version | 2.0.3 |
+| Interface | HTTP / REST |
+| Authentication | Basic Auth — **all requests carry credentials** |
+| Result | **40 / 40 use cases passed (100%)** |
+
+> Every request below was executed against a live station with authentication enabled.
+> Requests are shown with `-u "<USER>:<PASS>"` placeholders.
+
+---
 
 ## 一、功能
 
