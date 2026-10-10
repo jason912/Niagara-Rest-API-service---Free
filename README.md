@@ -11,7 +11,7 @@ See [ABOUT_THIS_JAR.md](ABOUT_THIS_JAR.md) if you are unsure which edition you h
 
 > **REST API for Niagara 4 — batch operations, deep copy, link-safe rename, and full component lifecycle. Built for AI automation.**
 >
-> **Two editions:** **v1 · niagaraRestApi** (lightweight, no auth, free) · **v2 · glineRestApi** (built-in authentication, BQL, program management — available on request)
+> **Two editions:** **v1 · niagaraRestApi** (lightweight, free) · **v2 · glineRestApi** (built-in authentication, BQL, program management — available on request)
 
 ---
 
@@ -20,7 +20,6 @@ See [ABOUT_THIS_JAR.md](ABOUT_THIS_JAR.md) if you are unsure which edition you h
 | | **v1 · niagaraRestApi** | **v2 · glineRestApi** |
 |:--|:--|:--|
 | **Availability** | ✅ In this repo | 🔒 **On request** |
-| **Authentication** | None | ✅ Basic Auth (required) |
 | **Access Control** | — | ✅ CIDR allow-list |
 | **BQL Query** | — | ✅ Structured JSON tables |
 | **Program Management** | — | ✅ Create / addslot / write / status |
@@ -34,7 +33,7 @@ Both editions are **independent modules** and can run side by side.
 
 ## What Is It?
 
-A lightweight REST API module for Niagara N4 stations. **v1** exposes a JSON-over-HTTP endpoint for **11 batch operations** — create, read, update, delete, copy, rename, duplicate, link, unlink, list, and invoke — all through a single `POST /api/batch` call, with no authentication layer for fast internal use.
+A lightweight REST API module for Niagara N4 stations. **v1** exposes a JSON-over-HTTP endpoint for **11 batch operations** — create, read, update, delete, copy, rename, duplicate, link, unlink, list, and invoke — all through a single `POST /api/batch` call.
 
 **v2** adds a mandatory authentication layer plus query and program-management capabilities, for deployments that require controlled access.
 
@@ -63,7 +62,7 @@ v2 keeps everything that made v1 useful, and adds a complete **security and quer
 
 In short: **v2 = v1 + authentication + access control + BQL + program management.**
 
-**In detail — the four things v1 cannot do:**
+**In detail — what v2 adds:**
 
 #### 🆕 BQL Query (v2 only)
 
@@ -93,7 +92,7 @@ Create programs, add slots, write source, and read status — all through the AP
 
 #### 🆕 Built-in Security (v2 only)
 
-Basic Auth (username + password, configurable at runtime) plus a CIDR allow-list to restrict access to trusted network segments. Configuration persists across restarts, so no external reverse proxy is required. **v1 has no authentication layer.**
+Basic Auth (username + password, configurable at runtime) plus a CIDR allow-list to restrict access to trusted network segments. Configuration persists across restarts, so no external reverse proxy is required.
 
 #### 🆕 Access-control hardening (v2 only)
 
@@ -135,8 +134,6 @@ curl -X POST http://your-station:8081/api/batch \
   -H "Content-Type: application/json" \
   -d '[{"OP":"LIST","PATH":"Drivers"}]'
 ```
-
-> **⚠️ v1 carries no authentication.** It is intended for trusted internal networks. For production exposure, wrap it with a reverse proxy, or use **v2**, which enforces authentication in the module itself.
 
 ### v2 · glineRestApi (on request, port 8082)
 
@@ -242,7 +239,7 @@ Full report: [docs/glineRestApi-v2-Test-Report.md](docs/glineRestApi-v2-Test-Rep
 |-----------|-------------|
 | **Niagara** | 4.14 or later |
 | **License** | None required |
-| **Auth** | v1: none (internal LAN) · **v2: built-in Basic Auth** |
+| **Auth** | **v2:** built-in Basic Auth + CIDR allow-list |
 | **Port** | 8081 (v1) · 8082 (v2) |
 
 ---

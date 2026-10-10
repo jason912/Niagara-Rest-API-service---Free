@@ -8,7 +8,6 @@
 | Module name | `niagaraRestApi-rt` (as declared inside `META-INF/module.xml`) |
 | Internal version | `1.0.1.4.14` |
 | Port | 8081 |
-| Authentication | None (intended for trusted internal networks) |
 | Niagara version | 4.14 |
 | Signed | Yes (GLINE + NIAGARA4 signatures) |
 
@@ -19,17 +18,11 @@
 `ADD` · `LINK` · `RENAME` · `DUPLICATE` · `CP` (deep copy) · `MOD` · `UNLINK` ·
 `REMOVE` · `READ` · `LIST` · `INVOKE`
 
-## What v1 does NOT do
+## Looking for more?
 
-| Capability | v1 | Where it lives |
-|:--|:--:|:--|
-| **BQL query** | ❌ returns `{"OP":"bql","status":"unknown"}` | **v2 only** |
-| Built-in authentication | ❌ | **v2 only** |
-| CIDR allow-list | ❌ | **v2 only** |
-| Program management | ❌ | **v2 only** |
-
-> **BQL is a v2 feature.** On v1, sending a BQL request returns `status:"unknown"`.
-> Verified live on :8081 (v1) and :8082 (v2) with the same request.
+**BQL query, built-in authentication with a CIDR allow-list, and program management
+are v2 features** (`glineRestApi`, port 8082) — a separate module, not distributed in
+this repository. See the "Getting v2" section of the main [README](README.md).
 
 ## Why the file name has no "v1"
 
