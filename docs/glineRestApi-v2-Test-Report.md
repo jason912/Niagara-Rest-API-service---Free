@@ -59,7 +59,7 @@
 
 **Request**:
 ```bash
-curl -s "http://<HOST>:8082/api/status"
+curl -s -u "<USER>:<PASS>" "http://<HOST>:8082/api/status"
 ```
 
 **Actual response (HTTP 200)**:
@@ -88,7 +88,7 @@ curl -s "http://<HOST>:8082/api/status"
 
 **Request**:
 ```bash
-curl -s "http://<HOST>:8082/api/modules"
+curl -s -u "<USER>:<PASS>" "http://<HOST>:8082/api/modules"
 ```
 
 **Actual response (HTTP 200)**:
@@ -114,7 +114,7 @@ curl -s "http://<HOST>:8082/api/modules"
 
 **Request**:
 ```bash
-curl -s "http://<HOST>:8082/api/types?q=NumericWritable"
+curl -s -u "<USER>:<PASS>" "http://<HOST>:8082/api/types?q=NumericWritable"
 ```
 
 **Actual response (HTTP 200)**:
@@ -140,7 +140,7 @@ curl -s "http://<HOST>:8082/api/types?q=NumericWritable"
 
 **Request**:
 ```bash
-curl -s "http://<HOST>:8082/api/config?path=/TCASE1791625276"
+curl -s -u "<USER>:<PASS>" "http://<HOST>:8082/api/config?path=/TCASE1791625276"
 ```
 
 **Actual response (HTTP 400)**:
@@ -166,7 +166,7 @@ curl -s "http://<HOST>:8082/api/config?path=/TCASE1791625276"
 
 **Request**:
 ```bash
-curl -s "http://<HOST>:8082/api/config?path=/TCASE1791625276"
+curl -s -u "<USER>:<PASS>" "http://<HOST>:8082/api/config?path=/TCASE1791625276"
 ```
 
 **Actual response (HTTP 200)**:
@@ -225,7 +225,7 @@ curl -s "http://<HOST>:8082/api/config?path=/TCASE1791625276"
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "add", "PATH": "/", "T": "baja:Folder", "N": "TCASE1791625276"}]'
 ```
@@ -257,7 +257,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "add", "PATH": "/TCASE1791625276", "T": "control:NumericWritable", "N": "Temp1"}]'
 ```
@@ -289,7 +289,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "add", "PATH": "/TCASE1791625276", "T": "control:StringWritable", "N": "Str1"}]'
 ```
@@ -321,7 +321,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "list", "PATH": "/TCASE1791625276"}]'
 ```
@@ -363,7 +363,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "mod", "PATH": "/TCASE1791625276/Temp1", "N": "out", "V": "42.5"}]'
 ```
@@ -396,7 +396,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "read", "PATH": "/TCASE1791625276/Temp1", "N": "out"}]'
 ```
@@ -430,7 +430,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "rename", "PATH": "/TCASE1791625276/Str1", "NEW": "Str1New"}]'
 ```
@@ -462,7 +462,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "cp", "PATH": "/TCASE1791625276/Temp1", "N": "Temp1Cpy"}]'
 ```
@@ -494,7 +494,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "link", "PATH": "/TCASE1791625276/Temp1", "N": "out", "TARGET": "/TCASE1791625276/Temp1Cpy", "TARGET_N": "in16"}]'
 ```
@@ -525,7 +525,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "read", "PATH": "/TCASE1791625276/Temp1Cpy", "N": "in16"}]'
 ```
@@ -559,7 +559,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "unlink", "TARGET": "/TCASE1791625276/Temp1Cpy"}]'
 ```
@@ -590,7 +590,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "invoke", "PATH": "/ProgTest/Demo1", "N": "execute"}]'
 ```
@@ -623,7 +623,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "bql", "Q": "select name,slotPath,out from control:NumericWritable", "SCOPE": "/Drivers/simulate", "LIMIT": "3"}]'
 ```
@@ -678,7 +678,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "bql", "Q": "select name,slotPath from baja:Component", "SCOPE": "/ProgTest", "LIMIT": "5"}]'
 ```
@@ -733,7 +733,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "add", "PATH": "/TCASE1791625276", "T": "control:NumericWritable", "N": "Batch1"}, {"OP": "mod", "PATH": "/TCASE1791625276/Batch1", "N": "out", "V": "7.7"}, {"OP": "read", "PATH": "/TCASE1791625276/Batch1", "N": "out"}]'
 ```
@@ -778,7 +778,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "remove", "PATH": "/TCASE1791625276/Temp1Cpy"}]'
 ```
@@ -813,7 +813,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "read", "PATH": "/NoSuchPath999x", "N": "out"}]'
 ```
@@ -844,7 +844,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "add", "PATH": "/TCASE1791625276", "T": "no:SuchType", "N": "X"}]'
 ```
@@ -875,7 +875,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "frobnicate", "PATH": "/TCASE1791625276"}]'
 ```
@@ -906,7 +906,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s "http://<HOST>:8082/api/batch"
+curl -s -u "<USER>:<PASS>" "http://<HOST>:8082/api/batch"
 ```
 
 **Actual response (HTTP 405)**:
@@ -936,7 +936,7 @@ curl -s "http://<HOST>:8082/api/batch"
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP": "add", "PATH": "/ProgTest", "T": "program:Program", "N": "CaseProg"}]'
 ```
@@ -968,7 +968,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/program/addslot" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/program/addslot" \
   -H "Content-Type: application/json" \
   -d '{"path": "/ProgTest/CaseProg", "name": "MySlot", "type": "control:NumericWritable"}'
 ```
@@ -999,7 +999,7 @@ curl -s -X POST "http://<HOST>:8082/api/program/addslot" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/program/write" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/program/write" \
   -H "Content-Type: application/json" \
   -d '{"path": "/ProgTest/CaseProg", "source": "import javax.baja.sys.*;\npublic class Prog_case extends ProgramBase {\n  public void onExecute() {}\n}\n"}'
 ```
@@ -1029,7 +1029,7 @@ curl -s -X POST "http://<HOST>:8082/api/program/write" \
 
 **Request**:
 ```bash
-curl -s "http://<HOST>:8082/api/program/status?path=/ProgTest/CaseProg"
+curl -s -u "<USER>:<PASS>" "http://<HOST>:8082/api/program/status?path=/ProgTest/CaseProg"
 ```
 
 **Actual response (HTTP 200)**:
@@ -1061,7 +1061,7 @@ curl -s "http://<HOST>:8082/api/program/status?path=/ProgTest/CaseProg"
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/program/compile" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/program/compile" \
   -H "Content-Type: application/json" \
   -d '{"path": "/ProgTest/CaseProg"}'
 ```
@@ -1101,7 +1101,7 @@ curl -s -X POST "http://<HOST>:8082/api/program/compile" \
 | Property | Value | Notes |
 |:--|:--|:--|
 | `authUser` | *(configured)* | Authentication enabled |
-| `authPass` | `<PASS>` | |
+| `authPass` | *(configured)* | |
 | `allowCidr` | *(empty)* | **No IP restriction** — any source may connect |
 | `port` | `8082` | |
 
@@ -1134,7 +1134,7 @@ Set via component properties: `authUser` (username) and `authPass` (password). *
 curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP":"mod","PATH":"/GlineRestApiV2","N":"authUser","V":"apiuser"},
-       {"OP":"mod","PATH":"/GlineRestApiV2","N":"authPass","V":"Secret123"}]'
+       {"OP":"mod","PATH":"/GlineRestApiV2","N":"authPass","V":"<PASS>"}]'
 ```
 
 ---
@@ -1152,7 +1152,7 @@ curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP":"list","PATH":"/V2Test"}]'
 ```
@@ -1194,7 +1194,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP":"list","PATH":"/V2Test"}]'
 ```
@@ -1222,7 +1222,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -u "apiuser:WrongPass" -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<WRONG>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP":"list","PATH":"/V2Test"}]'
 ```
@@ -1250,7 +1250,7 @@ curl -s -u "apiuser:WrongPass" -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -u "apiuser:Secret123" -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP":"list","PATH":"/V2Test"}]'
 ```
@@ -1301,8 +1301,8 @@ curl -s -u "apiuser:Secret123" -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s "http://<HOST>:8082/api/status"                    # no auth
-curl -s -u "<USER>:<PASS>" "http://<HOST>:8082/api/status"  # with auth
+curl -s "http://<HOST>:8082/api/status"                        # exempt: no credentials
+curl -s -u "<USER>:<PASS>" "http://<HOST>:8082/api/status"    # with credentials
 ```
 
 **Actual response (both HTTP 200)**:
@@ -1326,7 +1326,7 @@ curl -s -u "<USER>:<PASS>" "http://<HOST>:8082/api/status"  # with auth
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP":"list","PATH":"/V2Test"}]'
 ```
@@ -1386,7 +1386,7 @@ The `allowCidr` property accepts comma-separated ranges, e.g. `10.0.0.0/8,192.16
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP":"list","PATH":"/V2Test"}]'
 ```
@@ -1414,7 +1414,7 @@ curl -s -X POST "http://<HOST>:8082/api/batch" \
 
 **Request**:
 ```bash
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" \
   -d '[{"OP":"list","PATH":"/V2Test"}]'
 ```
@@ -1498,7 +1498,7 @@ after recovery, external request → HTTP 200 [{"OP":"list",...}]
 **Request**:
 ```bash
 # after restart - no auth
-curl -s -X POST "http://<HOST>:8082/api/batch" \
+curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/batch" \
   -H "Content-Type: application/json" -d '[{"OP":"list","PATH":"/V2Test"}]'
 
 # after restart - correct auth
