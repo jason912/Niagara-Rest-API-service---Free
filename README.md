@@ -1,5 +1,8 @@
 # Niagara-Rest-API-service---Free 🚀
 
+**📦 This repository ships the v1 module only (`niagaraRestApi-rt-v1.jar`).**
+**v2 (`glineRestApi`) is not distributed here — see [Getting v2](#getting-v2).**
+
 [![Niagara 4.14+](https://img.shields.io/badge/Niagara-4.14%2B-blue)](https://www.tridium.com)
 [![License: Free](https://img.shields.io/badge/License-Free-brightgreen)](LICENSE)
 [![Author](https://img.shields.io/badge/Author-jason912-blue)](https://github.com/jason912)
@@ -89,8 +92,10 @@ We will send the latest build (`glineRestApi-rt.jar`) with installation notes.
 
 ### v1 · niagaraRestApi (in this repo, port 8081)
 
+**Download:** [`niagaraRestApi-rt-v1.jar`](niagaraRestApi-rt-v1.jar) — this is the **v1** module.
+
 ```bash
-# 1. Add niagaraRestApi-rt.jar to your modules/ directory
+# 1. Add niagaraRestApi-rt-v1.jar to your modules/ directory
 # 2. Restart station
 # 3. The REST API is now live on port 8081 (configurable)
 
