@@ -1,6 +1,6 @@
 # About `niagaraRestApi-rt.jar`
 
-**This jar is the v1 module (`niagaraRestApi`).**
+**This jar is the v1 module (`niagaraRestApi`) — not v2.**
 
 | Item | Value |
 |:--|:--|
@@ -12,6 +12,25 @@
 | Niagara version | 4.14 |
 | Signed | Yes (GLINE + NIAGARA4 signatures) |
 
+## What v1 can do
+
+11 batch operations through a single `POST /api/batch`:
+
+`ADD` · `LINK` · `RENAME` · `DUPLICATE` · `CP` (deep copy) · `MOD` · `UNLINK` ·
+`REMOVE` · `READ` · `LIST` · `INVOKE`
+
+## What v1 does NOT do
+
+| Capability | v1 | Where it lives |
+|:--|:--:|:--|
+| **BQL query** | ❌ returns `{"OP":"bql","status":"unknown"}` | **v2 only** |
+| Built-in authentication | ❌ | **v2 only** |
+| CIDR allow-list | ❌ | **v2 only** |
+| Program management | ❌ | **v2 only** |
+
+> **BQL is a v2 feature.** On v1, sending a BQL request returns `status:"unknown"`.
+> Verified live on :8081 (v1) and :8082 (v2) with the same request.
+
 ## Why the file name has no "v1"
 
 The file name is kept as `niagaraRestApi-rt.jar` **on purpose**, to match the module
@@ -21,12 +40,6 @@ avoids any ambiguity during installation or upgrade.
 
 **Do not rename the file** — install it exactly as `niagaraRestApi-rt.jar` in your
 Niagara `modules/` directory.
-
-## What this is NOT
-
-- This is **not** v2. v2 is a **different module** (`glineRestApi`, port 8082) with
-  built-in authentication, BQL and program management. It is **not distributed in
-  this repository** — see the "Getting v2" section of the main [README](README.md).
 
 ## Install
 
@@ -39,3 +52,8 @@ curl -X POST http://your-station:8081/api/batch \
   -H "Content-Type: application/json" \
   -d '[{"OP":"LIST","PATH":"Drivers"}]'
 ```
+
+## Getting v2 (with BQL, auth, program management)
+
+v2 is a different module (`glineRestApi`, port 8082) and is **not distributed in this
+repository**. See the "Getting v2" section of the main [README](README.md).
