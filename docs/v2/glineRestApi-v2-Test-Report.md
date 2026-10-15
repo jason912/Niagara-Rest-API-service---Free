@@ -2,8 +2,9 @@
 
 | Item | Detail |
 |:--|:--|
-| Version | 2.0.3 |
-| Artifact MD5 | `d901d82e7294cc8dc6ef3a379f15c504` |
+| Version | 2.0.3 (test build, 2026-10-10) |
+| Artifact MD5 | `d901d82e7294cc8dc6ef3a379f15c504` (test build, now superseded) |
+| Current release | v2.4.0 — SHA-256 `efafe1e60096118ce1d768352c1088a4e3a5ff8c3c34d48f4b8aff6f3744f833` |
 | Interface | HTTP / REST |
 | Authentication | Basic Auth — every request carries credentials |
 | Test station | Niagara 4.14.0.162 |
@@ -23,8 +24,9 @@
 | Item | Value |
 |:--|:--|
 | System under test | glineRestApi v2 (`glineRestApi:RestApiServiceV2`) |
-| Version | 2.0.3 |
-| Artifact MD5 | `d901d82e7294cc8dc6ef3a379f15c504` |
+| Version | 2.0.3 (test build, 2026-10-10) |
+| Artifact MD5 | `d901d82e7294cc8dc6ef3a379f15c504` (test build, now superseded) |
+| Current release | v2.4.0 — SHA-256 `efafe1e60096118ce1d768352c1088a4e3a5ff8c3c34d48f4b8aff6f3744f833` |
 | Test station | Niagara 4.14.0.162 @ `<HOST>` |
 | Endpoint | `http://<HOST>:8082` |
 | Authentication | Basic Auth (credentials omitted) |
@@ -1090,8 +1092,9 @@ curl -s -u "<USER>:<PASS>" -X POST "http://<HOST>:8082/api/program/compile" \
 | Item | Value |
 |:--|:--|
 | System under test | glineRestApi v2 (`glineRestApi:RestApiServiceV2`) |
-| Version | 2.0.3 |
-| Artifact MD5 | `d901d82e7294cc8dc6ef3a379f15c504` |
+| Version | 2.0.3 (test build, 2026-10-10) |
+| Artifact MD5 | `d901d82e7294cc8dc6ef3a379f15c504` (test build, now superseded) |
+| Current release | v2.4.0 — SHA-256 `efafe1e60096118ce1d768352c1088a4e3a5ff8c3c34d48f4b8aff6f3744f833` |
 | Test station | Niagara 4.14.0.162 @ `<HOST>` |
 | Endpoint | `http://<HOST>:8082` |
 | Test date | 2026-10-10 |
