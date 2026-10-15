@@ -12,36 +12,6 @@ field returned by `GET /api/status`.
 
 ---
 
-## v2.5.0 — 2026-10-15
-
-**Alarm & history extension automation — attach, configure, and activate over REST.**
-
-### Added
-- **Alarm & history extension setup via `batch`.** Extensions are ordinary components, so
-  v2 can now drive the full capture setup over HTTP — no Workbench required.
-  - `{"OP":"add","PATH":"/pt","T":"history:NumericCovHistoryExt","N":"he"}`
-  - `{"OP":"mod","PATH":"/pt/he","N":"enabled","V":true}` → extension reports
-    `active=true` (collection live)
-  - `{"OP":"add","PATH":"/pt","T":"alarm:AlarmSourceExt","N":"ae"}`
-  - `{"OP":"mod","PATH":"/pt/ae","N":"alarmClass","V":"/AlarmClass"}`
-- Verified live on a Niagara 4.14 station: extension attached, slot written, and the
-  extension activated and read back through the API.
-
-### Notes
-- Extension types: `alarm:AlarmSourceExt`; `history:Numeric|Boolean|Enum|StringCovHistoryExt`;
-  `history:NumericIntervalHistoryExt`.
-- `timeDelay` (`RelTime`) is written as a **raw millisecond number** (`5000`), not `"5s"`.
-- `historyName` / `toOffnormalText` (`BFormat`) and `alarmEnable` (`AlarmTransitionBits`)
-  are **not** writable via `MOD` — a property-type limit, not an API limit.
-
-### Documentation
-- README: new **Alarm & History Extensions via REST** section with copy-paste `curl`
-  examples and a `MOD`-writable-slot table.
-- REST API Guide / User Guide: new chapter on extension setup, plus the companion
-  chapter on reading the collected data through the station's **Web Box** feature.
-
----
-
 ## v2.4.0 — 2026-10-15
 
 **Facet handling reworked: enum ranges, ordered facets, slot-facet reads.**
@@ -67,6 +37,28 @@ field returned by `GET /api/status`.
 - No operation was removed or renamed. All v2.3 operations and behaviours are intact
   (verified live: ADD / LINK / UNLINK / RENAME / CP / MOD / READ / LIST / BQL / INVOKE /
   FACET / FILE).
+
+### Usage notes — alarm & history extensions
+
+No new operation was needed for this; it uses the `ADD` / `MOD` that v2 has always had.
+Recorded here because it is the documented way to drive capture setup over HTTP —
+**no Workbench required**:
+
+```json
+{"OP":"add","PATH":"/pt","T":"history:NumericCovHistoryExt","N":"he"}
+{"OP":"mod","PATH":"/pt/he","N":"enabled","V":true}
+{"OP":"add","PATH":"/pt","T":"alarm:AlarmSourceExt","N":"ae"}
+{"OP":"mod","PATH":"/pt/ae","N":"alarmClass","V":"/AlarmClass"}
+```
+
+- Extensions attach to a **point**, not to the station root.
+- Extension types: `alarm:AlarmSourceExt`; `history:Numeric|Boolean|Enum|StringCovHistoryExt`;
+  `history:NumericIntervalHistoryExt`.
+- `timeDelay` (`RelTime`) is written as a **raw millisecond number** (`5000`), not `"5s"`.
+- `historyName` / `toOffnormalText` (`BFormat`) and `alarmEnable` (`AlarmTransitionBits`)
+  are **not** writable via `MOD` — a property-type limit, not an API limit.
+- Reading the collected *data* back is a separate topic: use the station's **Web Box**
+  (`/wsbox/query/data/`) — see the guide.
 
 ---
 
