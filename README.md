@@ -4,14 +4,16 @@
 **v2 (`glineRestApi`) is not distributed here — see [Getting v2](#getting-v2).**
 See [ABOUT_THIS_JAR.md](ABOUT_THIS_JAR.md) if you are unsure which edition you have.
 
-[![Niagara 4.14+](https://img.shields.io/badge/Niagara-4.14%2B-blue)](https://www.tridium.com)
+![Niagara 4.14+](https://img.shields.io/badge/Niagara-4.14%2B-blue)
 [![License: Free](https://img.shields.io/badge/License-Free-brightgreen)](LICENSE)
 [![Author](https://img.shields.io/badge/Author-jason912-blue)](https://github.com/jason912)
 [![Contact](https://img.shields.io/badge/Contact-WhatsApp-brightgreen)](https://wa.me/8613801909968)
 
 > **REST API for Niagara 4 — batch operations, deep copy, link-safe rename, and full component lifecycle. Built for AI automation.**
 >
-> **Two editions:** **v1 · niagaraRestApi** (lightweight, free) · **v2 · glineRestApi** (built-in authentication, BQL, program management — available on request)
+> **Two editions:** **v1 · niagaraRestApi** (lightweight, free) · **v2 · glineRestApi** (built-in authentication, BQL, program management, facet editing — available on request)
+>
+> **Latest v2: [v2.4.0](CHANGELOG.md)** · see the [CHANGELOG](CHANGELOG.md) for per-version details.
 
 ---
 
@@ -23,6 +25,7 @@ See [ABOUT_THIS_JAR.md](ABOUT_THIS_JAR.md) if you are unsure which edition you h
 | **Access Control** | — | ✅ CIDR allow-list |
 | **BQL Query** | — | ✅ Structured JSON tables |
 | **Program Management** | — | ✅ Create / addslot / write / status |
+| **Facet Editing** | — | ✅ Write facets (incl. enum ranges), read slot facets |
 | **Batch Operations** | ✅ | ✅ |
 | **Component Lifecycle** | ✅ | ✅ |
 | **Port** | 8081 | 8082 |
@@ -57,10 +60,11 @@ v2 keeps everything that made v1 useful, and adds a complete **security and quer
 | **Config persistence across restart** | — | ✅ |
 | **BQL query → structured JSON table** | ❌ | ✅ |
 | **Program management (write / addslot / status)** | ❌ | ✅ |
+| **Facet editing (write facets; enum ranges; read slot facets)** | ❌ | ✅ |
 | **Access-control hardening (401 on bad credentials)** | ❌ | ✅ |
 | Port | 8081 | 8082 |
 
-In short: **v2 = v1 + authentication + access control + BQL + program management.**
+In short: **v2 = v1 + authentication + access control + BQL + program management + facet editing.**
 
 **In detail — what v2 adds:**
 
@@ -89,6 +93,32 @@ Create programs, add slots, write source, and read status — all through the AP
 | `/api/program/write` | POST | Write program source |
 | `/api/program/addslot` | POST | Add a program slot |
 | `/api/program/status` | GET | Read class, status, checksum, source length |
+
+#### 🆕 Facet Editing (v2.4)
+
+Write **facets** on any property or point through `MOD`, and read a specific slot's
+facets back:
+
+```bash
+# Write facets on a point — numeric, units, precision
+curl -u "<USER>:<PASS>" -X POST http://your-station:8082/api/batch \
+  -H "Content-Type: application/json" \
+  -d '[{"OP":"mod","PATH":"/Folder/Point","N":"facets","V":"min=0;max=100;units=degC;precision=2"}]'
+
+# Enum facets — "range=A,B,C"  or indexed "range=0:Low,1:Mid,2:High"
+curl -u "<USER>:<PASS>" -X POST http://your-station:8082/api/batch \
+  -H "Content-Type: application/json" \
+  -d '[{"OP":"mod","PATH":"/Folder/Point","N":"facets","V":"range=Low,Mid,High"}]'
+
+# Read the facets of a specific slot
+curl -u "<USER>:<PASS>" -X POST http://your-station:8082/api/batch \
+  -H "Content-Type: application/json" \
+  -d '[{"OP":"read","PATH":"/Folder/Point","SLOT":"out"}]'
+```
+
+Supported: numeric facets (`min` / `max` / `precision` / `fieldWidth`), `units`,
+`trueText` / `falseText`, and enum **`range=`** in both plain (`A,B,C`) and indexed
+(`0:A,1:B`) forms.
 
 #### 🆕 Built-in Security (v2 only)
 
@@ -206,32 +236,38 @@ Full report: [docs/glineRestApi-v2-Test-Report.md](docs/glineRestApi-v2-Test-Rep
 
 ---
 
-## Competitive Advantages
+## Comparison (by channel)
 
-| Feature | Gline REST | oBIX | BTIB ACTIVE-API | Tridium /rest/ |
-|---------|:----------:|:----:|:---------------:|:--------------:|
+A capability overview across the common ways to talk to a station over HTTP.
+
+| Feature | **Gline REST API** | Built-in XML API | Third-party connector | Built-in REST |
+|---------|:------------------:|:----------------:|:---------------------:|:-------------:|
 | Atomic batch (11 ops, single POST) | ✅ | ❌ | ❌ | ❌ |
 | Deep Copy + link rebuild | ✅ | ❌ | ❌ | ❌ |
 | Rename preserves links | ✅ | ❌ | ❌ | ❌ |
 | Full component lifecycle (create → modify → link → rename → copy → delete) | ✅ | ❌ | ❌ | ❌ |
-| No SMA required | ✅ | ✅ | ✅ | ❌ |
-| Single .jar deployment | ✅ | built-in | .jar | built-in |
-| Built-in auth *(v2)* | ✅ | ✅ | ❌ | ✅ |
+| Facet editing *(v2.4)* | ✅ | ❌ | ❌ | ❌ |
 | BQL to JSON table *(v2)* | ✅ | ❌ | ❌ | ❌ |
+| Built-in auth *(v2)* | ✅ | ✅ | ❌ | ✅ |
+| Single .jar deployment | ✅ | built-in | .jar | built-in |
+| License fee | none | none | per station | none |
 
 ---
 
 ## Recommended Strategy
 
-| Use Case | Recommended |
-|----------|-------------|
+| Use Case | Recommended channel |
+|----------|---------------------|
 | Batch point creation / template deployment | **Gline REST API** (`POST /api/batch`) |
-| Alarm query and acknowledgement | **oBIX** (built-in) |
-| Historical trend data | **oBIX** (HistoryService) |
-| External API data ingestion | **BTIB RestNetwork** |
-| Production security | **v2** (built-in Basic Auth + CIDR allow-list) — no reverse proxy needed |
+| Facet editing (units, ranges, precision) | **Gline REST API** (v2.4) |
+| Component lifecycle automation | **Gline REST API** |
+| Alarm query and acknowledgement | Built-in XML API |
+| Historical trend data | Built-in XML API |
+| External API data ingestion | Third-party connector |
+| Production security | **Gline REST API v2** (built-in auth + CIDR allow-list) — no reverse proxy needed |
 
-**Bottom line:** Gline REST API + oBIX = full station management (component lifecycle + alarm + history) at zero license cost.
+**Bottom line:** Gline REST API covers the component lifecycle, queries, and facets over
+HTTP with no license fee — and pairs with the built-in XML API for alarms and history.
 
 ---
 
@@ -251,8 +287,9 @@ Full report: [docs/glineRestApi-v2-Test-Report.md](docs/glineRestApi-v2-Test-Rep
 | Manual | Description |
 |--------|-------------|
 | [REST API Guide](docs/Niagara_REST_API_Guide.pdf) | Complete API reference |
-| [API Comparison](docs/Niagara_API_Comparison_English.pdf) | Gline REST vs oBIX vs BTIB vs Tridium |
+| [API Comparison](docs/Niagara_API_Comparison_English.pdf) | Gline REST vs the common built-in / third-party channels |
 | [v2 Test Report](docs/glineRestApi-v2-Test-Report.md) | v2 — 40/40 use cases passed |
+| [CHANGELOG](CHANGELOG.md) | What each v2 version adds (v2.0 → v2.4.0) |
 
 ---
 
