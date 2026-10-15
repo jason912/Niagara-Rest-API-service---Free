@@ -13,7 +13,7 @@ See [ABOUT_THIS_JAR.md](ABOUT_THIS_JAR.md) if you are unsure which edition you h
 >
 > **Two editions:** **v1 · niagaraRestApi** (lightweight, free) · **v2 · glineRestApi** (built-in authentication, BQL, program management, facet editing — available on request)
 >
-> **Latest v2: [v2.4.0](CHANGELOG.md)** · see the [CHANGELOG](CHANGELOG.md) for per-version details.
+> **Latest v2: [v2.5.0](CHANGELOG.md)** · see the [CHANGELOG](CHANGELOG.md) for per-version details.
 
 ---
 
@@ -184,7 +184,7 @@ Missing or wrong credentials are rejected with **HTTP 401**; requests from outsi
 ## Getting v2
 
 **v2 is distributed on request** so we can match you with the right build and support.
-**Current v2 release: [v2.4.0](CHANGELOG.md)** — see the [CHANGELOG](CHANGELOG.md)
+**Current v2 release: [v2.5.0](CHANGELOG.md)** — see the [CHANGELOG](CHANGELOG.md)
 for what each v2 version adds.
 
 Send us:
@@ -297,6 +297,7 @@ A capability overview across the common ways to talk to a station over HTTP.
 | Deep Copy + link rebuild | ✅ | ❌ | ❌ | ❌ |
 | Rename preserves links | ✅ | ❌ | ❌ | ❌ |
 | Full component lifecycle (create → modify → link → rename → copy → delete) | ✅ | ❌ | ❌ | ❌ |
+| **Alarm & history extension setup *(v2.5)*** | ✅ | ❌ | ❌ | ❌ |
 | Facet editing *(v2.4)* | ✅ | ❌ | ❌ | ❌ |
 | BQL to JSON table *(v2)* | ✅ | ❌ | ❌ | ❌ |
 | Built-in auth *(v2)* | ✅ | ✅ | ❌ | ✅ |
@@ -310,10 +311,10 @@ A capability overview across the common ways to talk to a station over HTTP.
 | Use Case | Recommended channel |
 |----------|---------------------|
 | Batch point creation / template deployment | **Gline REST API** (`POST /api/batch`) |
+| Alarm & history extension setup (attach + activate) | **Gline REST API** (v2.5) |
 | Facet editing (units, ranges, precision) | **Gline REST API** (v2.4) |
 | Component lifecycle automation | **Gline REST API** |
-| Alarm query and acknowledgement | Built-in XML API |
-| Historical trend data | Built-in XML API |
+| Reading trend / alarm *data* | Built-in XML API, or Web Box (`/wsbox/query/data/`) |
 | External API data ingestion | Third-party connector |
 | Production security | **Gline REST API v2** (built-in auth + CIDR allow-list) — no reverse proxy needed |
 
@@ -340,7 +341,7 @@ HTTP with no license fee — and pairs with the built-in XML API for alarms and 
 | [REST API Guide](docs/Niagara_REST_API_Guide.pdf) | Complete API reference |
 | [API Comparison](docs/Niagara_API_Comparison_English.pdf) | Gline REST vs the common built-in / third-party channels |
 | [v2 Test Report](docs/glineRestApi-v2-Test-Report.md) | v2 — 40/40 use cases passed |
-| [CHANGELOG](CHANGELOG.md) | What each v2 version adds (v2.0 → v2.4.0) |
+| [CHANGELOG](CHANGELOG.md) | What each v2 version adds (v2.0 → v2.5.0) |
 
 ---
 
