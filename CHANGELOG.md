@@ -51,7 +51,6 @@ Recorded here because it is the documented way to drive capture setup over HTTP 
 {"OP":"mod","PATH":"/pt/ae","N":"alarmClass","V":"/AlarmClass"}
 ```
 
-- Extensions attach to a **point**, not to the station root.
 - Extension types: `alarm:AlarmSourceExt`; `history:Numeric|Boolean|Enum|StringCovHistoryExt`;
   `history:NumericIntervalHistoryExt`.
 - `timeDelay` (`RelTime`) is written as a **raw millisecond number** (`5000`), not `"5s"`.
