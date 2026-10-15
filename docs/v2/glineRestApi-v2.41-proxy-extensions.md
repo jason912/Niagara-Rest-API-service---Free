@@ -1,6 +1,6 @@
 # Assembling proxy extensions at point creation (`PROXY`)
 
-**Applies to `glineRestApi` v2.41.0 and later.**
+**Applies to `glineRestApi` v2.41 and later.**
 
 This document covers one thing: creating a point **with its driver proxy extension
 already attached**, in a single `add` operation.
@@ -159,7 +159,7 @@ Use the `...318.1.1.26.*` family:
 
 ---
 
-## Also in v2.41.0
+## Also in v2.41
 
 `GET /api/status` now reports the version read from the module's own
 `META-INF/module.xml`. It was previously a hardcoded literal that had drifted — it
@@ -167,7 +167,7 @@ returned `2.4` on a v2.4.0 build and would have kept returning it on this one.
 
 ```bash
 curl -u "<USER>:<PASS>" http://<HOST>:8082/api/status
-{"status":"ok","name":"glineRestApi","version":"2.41.0","port":8082}
+{"status":"ok","name":"glineRestApi","version":"2.41.1","port":8082}
 ```
 
 ---

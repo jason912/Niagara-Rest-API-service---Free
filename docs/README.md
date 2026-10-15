@@ -10,13 +10,13 @@ docs/
 ├── v1/                                ← niagaraRestApi (free, unauthenticated, port 8081)
 │   ├── niagaraRestApi-v1-guide.pdf
 │   └── niagaraRestApi-v1-comparison.pdf
-├── v2/                                ← glineRestApi (on request, authenticated, port 8082)
-│   ├── glineRestApi-v2-guide.pdf
-│   ├── glineRestApi-v2-comparison.pdf
-│   ├── glineRestApi-v2-whatsnew.pdf
-│   └── glineRestApi-v2-Test-Report.md
-└── v2.41-proxy/                       ← glineRestApi v2.41 onwards: PROXY on add
-    └── README.md
+└── v2/                                ← glineRestApi (on request, authenticated, port 8082)
+    ├── glineRestApi-v2-guide.pdf
+    ├── glineRestApi-v2-comparison.pdf
+    ├── glineRestApi-v2-whatsnew.pdf
+    ├── glineRestApi-v2-Test-Report.md
+    ├── glineRestApi-v2.41-proxy-extensions.md
+    └── glineRestApi-v2-signature-timestamp.md
 ```
 
 ## Which edition am I running?
@@ -58,7 +58,8 @@ editing, and alarm/history extension automation.
 
 | Document | What it covers |
 |:--|:--|
-| [`v2.41-proxy/README.md`](v2.41-proxy/README.md) | Assembling a point's driver proxy extension at creation time with the `PROXY` field — the problem it solves, both operational notes (restart after creating the point, one SNMP network per station), the two SNMP network types, and a verified reference run with APC PDU OIDs |
+| [`v2/glineRestApi-v2.41-proxy-extensions.md`](v2/glineRestApi-v2.41-proxy-extensions.md) | Assembling a point's driver proxy extension at creation time with the `PROXY` field — the problem it solves, both operational notes (restart after creating the point, one SNMP network per station), the two SNMP network types, and a verified reference run with APC PDU OIDs |
+| [`v2/glineRestApi-v2-signature-timestamp.md`](v2/glineRestApi-v2-signature-timestamp.md) | Signature timestamps — what "not timestamped" means, why it matters once the signing certificate expires, how to add and verify one, and why timestamping must be the last step (it changes the hashes) |
 
 ## A note on the two editions' differences
 

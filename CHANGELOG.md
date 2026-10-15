@@ -12,6 +12,27 @@ field returned by `GET /api/status`.
 
 ---
 
+## v2.41.1 — 2026-10-15
+
+**Re-release of v2.41.0 with a signed timestamp. Use this instead of v2.41.0.**
+
+### Fixed
+- The jar's signature now carries an RFC 3161 timestamp
+  (`-tsa http://timestamp.digicert.com`). v2.41.0 was signed without one, so
+  Workbench reported it as **"not timestamped"** and its signature would have
+  stopped validating when the signing certificate expires.
+
+### Notes
+- Functionally identical to v2.41.0. The timestamp is the only change — and it
+  is why the hashes differ from v2.41.0.
+- Timestamping rewrites `META-INF/` inside the jar, so the MD5/SHA-256 change.
+  Timestamping is the last step before release.
+
+See [`docs/v2/glineRestApi-v2-signature-timestamp.md`](docs/v2/glineRestApi-v2-signature-timestamp.md)
+for what "not timestamped" means and how to check any deployed jar.
+
+---
+
 ## v2.41.0 — 2026-10-15
 
 **Proxy extensions can be assembled at point creation.**
@@ -42,7 +63,8 @@ field returned by `GET /api/status`.
   legacy `snmp:SnmpNetwork` type has no `sendConfig`/`receiveConfig`/`trapConfig`
   slots and its devices fault regardless of the point configuration.
 
-See [`docs/v2.41-proxy/`](docs/v2.41-proxy/README.md) for the full write-up and the
+See [`docs/v2/glineRestApi-v2.41-proxy-extensions.md`](docs/v2/glineRestApi-v2.41-proxy-extensions.md)
+for the full write-up and the
 verified reference run.
 
 ### Compatibility
