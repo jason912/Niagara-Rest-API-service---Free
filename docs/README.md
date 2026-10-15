@@ -10,11 +10,13 @@ docs/
 ├── v1/                                ← niagaraRestApi (free, unauthenticated, port 8081)
 │   ├── niagaraRestApi-v1-guide.pdf
 │   └── niagaraRestApi-v1-comparison.pdf
-└── v2/                                ← glineRestApi (on request, authenticated, port 8082)
-    ├── glineRestApi-v2-guide.pdf
-    ├── glineRestApi-v2-comparison.pdf
-    ├── glineRestApi-v2-whatsnew.pdf
-    └── glineRestApi-v2-Test-Report.md
+├── v2/                                ← glineRestApi (on request, authenticated, port 8082)
+│   ├── glineRestApi-v2-guide.pdf
+│   ├── glineRestApi-v2-comparison.pdf
+│   ├── glineRestApi-v2-whatsnew.pdf
+│   └── glineRestApi-v2-Test-Report.md
+└── v2.41-proxy/                       ← glineRestApi v2.41 onwards: PROXY on add
+    └── README.md
 ```
 
 ## Which edition am I running?
@@ -51,6 +53,12 @@ no alarm/history query.
 
 **v2 in one line:** v1 plus authentication, access control, BQL, program management, facet
 editing, and alarm/history extension automation.
+
+### v2.41 onwards
+
+| Document | What it covers |
+|:--|:--|
+| [`v2.41-proxy/README.md`](v2.41-proxy/README.md) | Assembling a point's driver proxy extension at creation time with the `PROXY` field — the problem it solves, both operational notes (restart after creating the point, one SNMP network per station), the two SNMP network types, and a verified reference run with APC PDU OIDs |
 
 ## A note on the two editions' differences
 

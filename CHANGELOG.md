@@ -12,6 +12,45 @@ field returned by `GET /api/status`.
 
 ---
 
+## v2.41.0 — 2026-10-15
+
+**Proxy extensions can be assembled at point creation.**
+
+### Added
+- **`PROXY` on `add`** — attach a driver proxy extension to the point's protected
+  `proxyExt` slot in the same operation that creates the point. Optional
+  `PROXY_SLOT` names a different slot (default `proxyExt`).
+  ```json
+  {"OP":"add","PATH":"/Drivers/SnmpNetwork1/PDU_AP8858_180/points",
+   "T":"control:NumericWritable","N":"Phase1_Voltage",
+   "PROXY":"nSnmp:SnmpNumericProxyExt"}
+  ```
+  Previously the proxy slot could not be filled at all: `remove` was rejected as
+  protected and `add` was rejected because the slot already existed. The resulting
+  point read `0.00 {fault,stale}` permanently.
+
+### Fixed
+- `/api/status` reports the version read from the module's own
+  `META-INF/module.xml`. It was a hardcoded literal that had drifted to `2.4`.
+
+### Notes
+- **Restart the station after creating the point.** The proxy does not poll until
+  then; before the restart the point reports
+  `faultCause = "Read fault: Illegal Object Identifier"`. Re-setting the OID does
+  not substitute for the restart.
+- For SNMP, build the network as `T="nSnmp:SnmpNetwork"` (the nDriver type). The
+  legacy `snmp:SnmpNetwork` type has no `sendConfig`/`receiveConfig`/`trapConfig`
+  slots and its devices fault regardless of the point configuration.
+
+See [`docs/v2.41-proxy/`](docs/v2.41-proxy/README.md) for the full write-up and the
+verified reference run.
+
+### Compatibility
+- No operation was removed or renamed. All v2.4 operations and behaviours are
+  intact. Omitting `PROXY` preserves the previous `add` behaviour exactly.
+
+---
+
 ## v2.4.0 — 2026-10-15
 
 **Facet handling reworked: enum ranges, ordered facets, slot-facet reads.**
