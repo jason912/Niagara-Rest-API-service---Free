@@ -103,6 +103,8 @@ Missing or wrong credentials are rejected with **HTTP 401**; requests from outsi
 ## Getting v2
 
 **v2 is distributed on request** so we can match you with the right build and support.
+**Current v2 release: [v2.4.0](CHANGELOG.md)** — see the [CHANGELOG](CHANGELOG.md)
+for what each v2 version adds.
 
 Send us:
 
@@ -267,3 +269,4 @@ Full report: [docs/glineRestApi-v2-Test-Report.md](docs/glineRestApi-v2-Test-Rep
 > **Disclaimer:** Features verified on Niagara N4.14. Capabilities may vary by station version and configuration.
 
 © 2026 Shanghai Gline Net Co., Ltd. All rights reserved.
+
