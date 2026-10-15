@@ -143,7 +143,7 @@ Extensions created over REST stay fully visible and editable in Workbench.
 **Reading the collected data** — the REST API has no alarm/history *query* endpoint by
 design; that part is read through the station's **Web Box** feature
 (`/wsbox/query/data/<ord>` and friends), which is automatable too. See the
-[REST API Guide](docs/Niagara_REST_API_Guide.pdf) for the full procedure.
+[v2 REST API Guide](docs/v2/glineRestApi-v2-guide.pdf) for the full procedure.
 
 #### 🆕 Facet Editing (v2.4)
 
@@ -241,7 +241,7 @@ curl -u "USER:PASS" -X POST http://your-station:8082/api/batch \
 | Access Control | 11 | 11 |
 | **Total** | **40** | **40** |
 
-Full report: [docs/glineRestApi-v2-Test-Report.md](docs/glineRestApi-v2-Test-Report.md)
+Full report: [docs/v2/glineRestApi-v2-Test-Report.md](docs/v2/glineRestApi-v2-Test-Report.md)
 
 ### Functional cases (29)
 
@@ -338,9 +338,13 @@ HTTP with no license fee — and pairs with the built-in XML API for alarms and 
 
 | Manual | Description |
 |--------|-------------|
-| [REST API Guide](docs/Niagara_REST_API_Guide.pdf) | Complete API reference |
-| [API Comparison](docs/Niagara_API_Comparison_English.pdf) | Gline REST vs the common built-in / third-party channels |
-| [v2 Test Report](docs/glineRestApi-v2-Test-Report.md) | v2 — 40/40 use cases passed |
+| [docs/](docs/README.md) | **Documentation index — split by edition** |
+| [v1 Guide](docs/v1/niagaraRestApi-v1-guide.pdf) | niagaraRestApi v1 — complete reference |
+| [v1 Comparison](docs/v1/niagaraRestApi-v1-comparison.pdf) | v1 vs the other channels |
+| [v2 Guide](docs/v2/glineRestApi-v2-guide.pdf) | glineRestApi v2 — complete reference |
+| [v2 Comparison](docs/v2/glineRestApi-v2-comparison.pdf) | v2 vs the other channels |
+| [v2 What's New](docs/v2/glineRestApi-v2-whatsnew.pdf) | What v2 adds over v1 |
+| [v2 Test Report](docs/v2/glineRestApi-v2-Test-Report.md) | v2 — 40/40 use cases passed |
 | [CHANGELOG](CHANGELOG.md) | What each v2 version adds (v2.0 → v2.5.0) |
 
 ---
