@@ -61,10 +61,11 @@ v2 keeps everything that made v1 useful, and adds a complete **security and quer
 | **BQL query → structured JSON table** | ❌ | ✅ |
 | **Program management (write / addslot / status)** | ❌ | ✅ |
 | **Facet editing (write facets; enum ranges; read slot facets)** | ❌ | ✅ |
+| **Alarm & History extension setup (attach + configure + activate)** | ❌ | ✅ |
 | **Access-control hardening (401 on bad credentials)** | ❌ | ✅ |
 | Port | 8081 | 8082 |
 
-In short: **v2 = v1 + authentication + access control + BQL + program management + facet editing.**
+In short: **v2 = v1 + authentication + access control + BQL + program management + facet editing + alarm/history extension automation.**
 
 **In detail — what v2 adds:**
 
@@ -93,6 +94,56 @@ Create programs, add slots, write source, and read status — all through the AP
 | `/api/program/write` | POST | Write program source |
 | `/api/program/addslot` | POST | Add a program slot |
 | `/api/program/status` | GET | Read class, status, checksum, source length |
+
+#### 🆕 Alarm & History Extensions via REST (v2) — fully automated
+
+**You do not need Workbench to set up data capture.** Alarm and history extensions are
+ordinary components, so v2 can attach, configure, and *activate* them over HTTP —
+verified live on a Niagara 4.14 station.
+
+```bash
+# Attach a history extension to a point and activate it
+curl -u "<USER>:<PASS>" -X POST http://your-station:8082/api/batch \
+  -H "Content-Type: application/json" -d '[
+{"OP":"add","PATH":"/myFolder/pt","T":"history:NumericCovHistoryExt","N":"he"},
+{"OP":"mod","PATH":"/myFolder/pt/he","N":"enabled","V":true}
+]'
+# → enabled=true, active=true  — history collection is live
+
+# Attach an alarm extension and configure it
+curl -u "<USER>:<PASS>" -X POST http://your-station:8082/api/batch \
+  -H "Content-Type: application/json" -d '[
+{"OP":"add","PATH":"/myFolder/pt","T":"alarm:AlarmSourceExt","N":"ae"},
+{"OP":"mod","PATH":"/myFolder/pt/ae","N":"alarmClass","V":"/AlarmClass"},
+{"OP":"mod","PATH":"/myFolder/pt/ae","N":"timeDelay","V":5000}
+]'
+```
+
+| Extension type | Purpose |
+|:--|:--|
+| `alarm:AlarmSourceExt` | Alarm source extension |
+| `history:NumericCovHistoryExt` | Numeric history, change-of-value |
+| `history:BooleanCovHistoryExt` | Boolean history, change-of-value |
+| `history:EnumCovHistoryExt` | Enum history, change-of-value |
+| `history:StringCovHistoryExt` | String history, change-of-value |
+| `history:NumericIntervalHistoryExt` | Numeric history, fixed interval |
+
+**Writing slots — what works**
+
+| Slot | Behaviour |
+|:--|:--|
+| `enabled` | Boolean — writable; activates a history extension |
+| `alarmClass` | String — writable |
+| `timeDelay` | `RelTime` — write a **raw millisecond number** (`5000`), not `"5s"` |
+| `historyName` / `toOffnormalText` | `BFormat` — **not** writable via MOD |
+| `alarmEnable` | `AlarmTransitionBits` — **not** writable via MOD |
+
+Extensions created over REST stay fully visible and editable in Workbench.
+
+**Reading the collected data** — the REST API has no alarm/history *query* endpoint by
+design; that part is read through the station's **Web Box** feature
+(`/wsbox/query/data/<ord>` and friends), which is automatable too. See the
+[REST API Guide](docs/Niagara_REST_API_Guide.pdf) for the full procedure.
 
 #### 🆕 Facet Editing (v2.4)
 
