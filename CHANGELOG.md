@@ -12,6 +12,34 @@ field returned by `GET /api/status`.
 
 ---
 
+## v2.41.3 — 2026-10-16
+
+**Facet `units` are written as real units, not text.**
+
+### Fixed
+- `mod` on `facets` now stores the `units` facet as a `javax.baja.units.BUnit` object
+  instead of a string. Storing it as text left a value that crashed Workbench when it
+  rendered the point:
+  ```
+  java.lang.ClassCastException: javax.baja.sys.BString cannot be cast to javax.baja.units.BUnit
+      at javax.baja.sys.BDouble.toString(BDouble.java:393)
+      at com.tridium.wiresheet.PropertyBarGlyph.updateValueString(PropertyBarGlyph.java:60)
+  ```
+  `units` is now resolved from the station's unit database by name (`volt`, `ampere`,
+  `watt`, `volt ampere`, `kilowatt hour`, …). A name that does not resolve is rejected
+  with a clear error rather than stored. `units=null` (or omitting `units`) clears the
+  unit.
+
+### Notes
+- Fields in the facet string are separated by **`;`**; a comma is not a separator.
+- A correctly stored unit reads back as its **symbol** (`units=V`), not the name written
+  (`volt`).
+
+See [`docs/v2/glineRestApi-v2-facets.md`](docs/v2/glineRestApi-v2-facets.md) for the
+facet string reference, the unit names that resolve, and how to verify a write.
+
+---
+
 ## v2.41.1 — 2026-10-15
 
 **Re-release of v2.41.0 with a signed timestamp. Use this instead of v2.41.0.**
