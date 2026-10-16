@@ -17,6 +17,7 @@ docs/
     ├── glineRestApi-v2-Test-Report.md
     ├── glineRestApi-v2.41-proxy-extensions.md
     ├── glineRestApi-v2-facets.md
+    ├── glineRestApi-v2-facets.pdf
     └── glineRestApi-v2-signature-timestamp.md
 ```
 
@@ -60,7 +61,7 @@ editing, and alarm/history extension automation.
 | Document | What it covers |
 |:--|:--|
 | [`v2/glineRestApi-v2.41-proxy-extensions.md`](v2/glineRestApi-v2.41-proxy-extensions.md) | Assembling a point's driver proxy extension at creation time with the `PROXY` field — the problem it solves, both operational notes (restart after creating the point, one SNMP network per station), the two SNMP network types, and a verified reference run with APC PDU OIDs |
-| [`v2/glineRestApi-v2-facets.md`](v2/glineRestApi-v2-facets.md) | Editing facets over REST — the facet string, the two traps (`;` is the separator, a unit must be a `BUnit` not text), the unit names that resolve, and how to verify a facet write by its rendering |
+| [`v2/glineRestApi-v2-facets.md`](v2/glineRestApi-v2-facets.md) · [PDF](v2/glineRestApi-v2-facets.pdf) | Editing facets over REST — the facet string, the two traps (`;` is the separator, a unit must be a `BUnit` not text), the unit names that resolve, and how to verify a facet write by its rendering |
 | [`v2/glineRestApi-v2-signature-timestamp.md`](v2/glineRestApi-v2-signature-timestamp.md) | Signature timestamps — what "not timestamped" means, why it matters once the signing certificate expires, how to add and verify one, and why timestamping must be the last step (it changes the hashes) |
 
 ## A note on the two editions' differences
