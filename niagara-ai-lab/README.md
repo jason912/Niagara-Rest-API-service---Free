@@ -9,6 +9,22 @@ The point of the exercise: find out which of the two station-side channels can
 actually do a given job, where each one stops, and how to prove that a deployment
 really works instead of trusting a green status icon.
 
+## Two halves, opposite directions
+
+The material is split by direction, because the two directions use different
+objects and fail in different ways:
+
+| | Part 1 — the station is the **server** | Part 2 — the station is the **client** |
+|:--|:--|:--|
+| Question | how do station points become BACnet, oBIX and Modbus objects? | how does the station poll devices and hold their values? |
+| Objects | export descriptors, slave points | driver network, device, point + proxy extension |
+| Fails at | binding the source (`BOrd`, enum slots) | the proxy extension and the register decode |
+| Proof | an outside client reads the published point | an outside write appears in the station point |
+| Folder | [`part1-server/`](./part1-server/) | [`part2-client/`](./part2-client/) |
+
+Each part has its own README, its own deck, and its own documents. Read the part
+that matches the direction you are building.
+
 ## Two channels, one station
 
 | Channel | Endpoint | Best at |
@@ -45,11 +61,14 @@ success without delivering it are listed in the collection guide.
 
 | Document | What it answers |
 |---|---|
-| [`niagara-protocol-capability-matrix.pdf`](./niagara-protocol-capability-matrix.pdf) | 10-page deck: capability matrix for both interfaces, the three-step publish flow per protocol, the two traps that cost the most time, and how to prove collection is live |
-| [`niagara-bacnet-server-points.md`](./niagara-bacnet-server-points.md) | Exposing station points as BACnet objects: three-layer enable order, `exportTable`, the three slots split across two channels, and the rename that happens behind your back |
-| [`niagara-modbus-server-points.md`](./niagara-modbus-server-points.md) | Exposing station points as Modbus registers: why `add` alone produces a broken point, `dataAddress` versus `address`, and the `dataType` copy trap |
-| [`niagara-obix-server-points.md`](./niagara-obix-server-points.md) | Exposing station points as oBIX points: the `point` slot is writable by one channel only, plus what the interface cannot do at all |
-| [`niagara-client-collection.md`](./niagara-client-collection.md) | Collecting from field devices: four signals that lie, the two counters that settle it, and the only proof that counts |
+| [`part1-server/README.md`](./part1-server/README.md) | Part 1 overview: the three-step publish pattern, what is common to all three protocols, what differs |
+| [`part1-server/part1-publishing-points.pdf`](./part1-server/part1-publishing-points.pdf) | 9-page deck: object trees, the three-layer BACnet enable, the slots split across two channels, the Modbus slave trap, fault reference |
+| [`part1-server/niagara-bacnet-server-points.md`](./part1-server/niagara-bacnet-server-points.md) | Exposing station points as BACnet objects: three-layer enable order, `exportTable`, the three slots split across two channels, and the rename that happens behind your back |
+| [`part1-server/niagara-obix-server-points.md`](./part1-server/niagara-obix-server-points.md) | Exposing station points as oBIX points: the `point` slot is writable by one channel only, plus what the interface cannot do at all |
+| [`part1-server/niagara-modbus-server-points.md`](./part1-server/niagara-modbus-server-points.md) | Exposing station points as Modbus registers: why `add` alone produces a broken point, `dataAddress` versus `address`, and the `dataType` copy trap |
+| [`part2-client/README.md`](./part2-client/README.md) | Part 2 overview: the four-step client chain per protocol, the proxy-extension requirement, the slots to re-check on every copied point |
+| [`part2-client/part2-collecting-points.pdf`](./part2-client/part2-collecting-points.pdf) | 9-page deck: building the chain over the API, the client chain per protocol, the four signals that lie, the two counters, the outside-drive test, the open case |
+| [`part2-client/niagara-client-collection.md`](./part2-client/niagara-client-collection.md) | Collecting from field devices: four signals that lie, the two counters that settle it, and the only proof that counts |
 
 Each protocol document follows the same shape: where the objects live, how to
 create and bind them, how to verify from outside the station, and a fault

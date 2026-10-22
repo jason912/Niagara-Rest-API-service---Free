@@ -3,7 +3,8 @@
 **Applies to** Niagara N4 (verified on 4.14.0.162).
 This is the **client** direction: the station polls external devices and holds their
 values in station points. The opposite direction (publishing station points outward) is
-covered by the BACnet / oBIX / Modbus server documents in this folder.
+covered by the BACnet / oBIX / Modbus server documents in
+[`../part1-server/`](../part1-server/).
 
 Everything here is about one question that is easy to get wrong: **is the point actually
 being collected, or does it just look plausible?**
@@ -87,6 +88,81 @@ intent, not as a diagnosis.
 
 ---
 
+## Building the chain over the API
+
+All four objects in the chain are created the same way. The one field that matters is
+`PROXY` on the point.
+
+### 1. Driver network
+
+```json
+{"OP":"add","PATH":"/Drivers","N":"ModbusTcpNetwork","T":"modbusTcp:ModbusTcpNetwork"}
+{"OP":"mod","PATH":"/Drivers/ModbusTcpNetwork","N":"enabled","V":"true"}
+```
+
+A network left `{disabled}` makes every device under it inert, and the point symptoms
+look identical to a broken proxy.
+
+### 2. Device
+
+```json
+{"OP":"add","PATH":"/Drivers/ModbusTcpNetwork","N":"<device>","T":"modbusTcp:ModbusTcpDevice"}
+{"OP":"mod","PATH":"/Drivers/ModbusTcpNetwork/<device>","N":"ipAddress","V":"<HOST>"}
+{"OP":"mod","PATH":"/Drivers/ModbusTcpNetwork/<device>","N":"port","V":"502"}
+{"OP":"mod","PATH":"/Drivers/ModbusTcpNetwork/<device>","N":"deviceAddress","V":"1"}
+```
+
+`deviceAddress` is the Modbus unit id, not the station's ord. For BACnet the equivalent
+is one `address` slot holding a `BacnetAddress` — a `BOrd` slot, so it goes over oBIX.
+
+### 3. Point, with its proxy extension
+
+```json
+{"OP":"add","PATH":"/Drivers/ModbusTcpNetwork/<device>/points",
+ "N":"<point>","T":"control:NumericPoint",
+ "PROXY":"modbusCore:ModbusClientNumericProxyExt"}
+```
+
+Without `PROXY` the point is created with a `NullProxyExt` and reads `0.00 {fault,stale}`
+forever. The slot cannot be filled afterwards: `proxyExt` is a protected slot, adding a
+child to it is illegal, and removing it is refused.
+
+### 4. Proxy extension slots
+
+`dataType` is an enum and `dataAddress` is a structured address — neither is writable
+through `mod`, so both go over oBIX:
+
+```
+GET  /obix/config/Drivers/ModbusTcpNetwork/<device>/points/<point>/proxyExt/dataType/~range
+PUT  .../proxyExt/dataType     <enum val="integerType"/>
+PUT  .../proxyExt/dataAddress  <obj><str name="type" val="HR"/><int name="offset" val="1"/></obj>
+```
+
+A point copied with `cp` inherits the settings of its source, including a `dataType` that
+will not match the new register. An integer register decoded as `Float Type` reads
+`0.00 {stale}` with an empty `faultCause`.
+
+### 5. Poll range
+
+`devicePollConfig` ranges are built by the driver from `dataAddress` values. A point added
+after the range was created does not automatically appear in it, and a range entry with
+`consecutivePointsToPoll = 0` is a description of intent, not a fault.
+
+### 6. The step that costs an afternoon
+
+A proxy assembled over REST does not begin polling until the station is restarted. Until
+then the point reports a fault rather than a value:
+
+```
+out        = 0.00 {fault,stale}
+faultCause = "Read fault: Illegal Object Identifier"
+```
+
+That message is about the missing proxy binding, not about the field device. Do not go
+looking for the device until the proxy has been through a restart at least once.
+
+---
+
 ## The only reliable proof: change the value outside
 
 Configure nothing, trust nothing, and drive the far end:
@@ -99,19 +175,37 @@ Configure nothing, trust nothing, and drive the far end:
 The point must change to the new value with `{ok}`. This is the one test that cannot be
 faked by status facets, health monitors, or copied values.
 
-### Worked Modbus case
+### Worked Modbus case: a slave, a client point, and what the station actually did
 
-A slave network and one client point on the same station, pointed at the station's own
-slave port, is the cheapest possible loop:
+One station, one Modbus TCP slave network (`ZZ_Srv`, port 502, unit 1) and one client
+device (`zz_self`) pointed at that same port, with a client point `C1` on holding
+register 1. An external Modbus master writes the register directly:
 
 ```
-external Modbus master: FC06 write HR[1] = 5555  →  client point C1 = 5555.00 {ok}
-external Modbus master: FC06 write HR[1] = 6666  →  client point C1 = 6666.00 {ok}
-external Modbus master: FC06 write HR[1] = 4321  →  client point C1 = 4321.00 {ok}
+FC06 write HR[1] = 7777                       request  1234 0000 0006 01 06 0001 1e61
+                                              response 1234 0000 0006 01 06 0001 1e61
+FC03 read  HR[0..1]                           response 1234 0000 0007 01 03 04 04d2 1e61
+
+server point  /Drivers/ZZ_Srv/ZZ_SrvDev/points/Srv_Reg1   = 7777.0 {ok}
+client point  /Drivers/ModbusTcpNetwork/zz_self/points/C1 = 6666.0 {stale}
 ```
 
-Three distinct values, each reflected, with `totalPolls` climbing and the slave network's
-`currentConnections = 1` throughout. That is a working client.
+The write is accepted, the slave side reflects it immediately, and the independent read
+confirms register 1 holds `0x1E61` = 7777. The client point does not follow:
+
+| Observation | Value | Meaning |
+|:--|:--|:--|
+| `C1/out` | `6666.0 {stale}` | unchanged across the write |
+| `C1/proxyExt/status` | `10 {stale}` | the extension never produced a value |
+| `C1/proxyExt/dataAddress` | `Modbus:40002` | HR offset 1, unit 1 — correct for the write above |
+| `C1/proxyExt/dataType` | `integerType` | correct for the register |
+| `ModbusTcpNetwork/pollScheduler.totalPolls` | `12k over 28sec`, frozen | the scheduler stopped at 28 s of work |
+| `SnmpNetwork1/pollScheduler.totalPolls` | `22k over 3504sec`, still climbing | the station's schedulers do run |
+
+This is the value of the external test: every configuration slot on that client point
+looks right, the far end demonstrably holds the value, and the point still does not
+follow. The frozen scheduler 28 seconds into a run that started hours earlier is the only
+honest reading, and it points at the poll queue rather than at the register or the device.
 
 ### Why a *copy* of a device proves nothing
 
@@ -177,7 +271,8 @@ and keep **one** SNMP network per station. Both traps are covered in
 ### oBIX client
 
 `ObixNetwork` devices read an external oBIX server. The export-side rules in
-`niagara-obix-server-points.md` apply in reverse: a `{fault}` on the imported point
+[`../part1-server/niagara-obix-server-points.md`](../part1-server/niagara-obix-server-points.md)
+apply in reverse: a `{fault}` on the imported point
 usually means the far server does not expose the path, not that the station is broken.
 
 ---

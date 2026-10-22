@@ -142,7 +142,7 @@ Extensions created over REST stay fully visible and editable in Workbench.
 
 **Reading the collected data** — the REST API has no alarm/history *query* endpoint by
 design; that part is read over **oBIX**, which is automatable too. See the
-[oBIX point guide](niagara-ai-lab/niagara-obix-server-points.md) for the query endpoints
+[oBIX point guide](niagara-ai-lab/part1-server/niagara-obix-server-points.md) for the query endpoints
 and the slot-binding rules.
 
 #### 🆕 Facet Editing (v2.4)
@@ -345,7 +345,7 @@ HTTP with no license fee — and pairs with oBIX for alarms and history.
 | [v2 Comparison](docs/v2/glineRestApi-v2-comparison.pdf) | v2 vs the other channels |
 | [v2 What's New](docs/v2/glineRestApi-v2-whatsnew.pdf) | What v2 adds over v1 |
 | [v2 Test Report](docs/v2/glineRestApi-v2-Test-Report.md) | v2 — 40/40 use cases passed |
-| [AI automation lab](niagara-ai-lab/README.md) | Driving a station through the API only — capability deck, BACnet / Modbus / oBIX point publishing, and how collection is proven |
+| [AI automation lab](niagara-ai-lab/README.md) | Driving a station through the API only — split into [Part 1: publishing points](niagara-ai-lab/part1-server/) (BACnet / oBIX / Modbus servers) and [Part 2: collecting points](niagara-ai-lab/part2-client/) (clients, proxy extensions, proof of collection) |
 | [CHANGELOG](CHANGELOG.md) | What each v2 version adds (v2.0 → v2.4.0) |
 
 ---

@@ -223,7 +223,7 @@ Baseline "secure + link" build.**
 
 ### Verified
 - **40 test cases passed** — 29 functional + 11 access-control. Full report:
-  [`docs/glineRestApi-v2-Test-Report.md`](docs/glineRestApi-v2-Test-Report.md).
+  [`docs/v2/glineRestApi-v2-Test-Report.md`](docs/v2/glineRestApi-v2-Test-Report.md).
 
 ### Notes
 - Runs on port **8082** (v1 runs on 8081; both can run side by side).

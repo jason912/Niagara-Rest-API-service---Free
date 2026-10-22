@@ -71,12 +71,15 @@ an outside-client verification, so a claim can be re-tested instead of trusted.
 
 | Document | What it covers |
 |:--|:--|
-| [`../niagara-ai-lab/README.md`](../niagara-ai-lab/README.md) | Index, the two-channel summary, and the verification rules used throughout |
-| [`../niagara-ai-lab/niagara-protocol-capability-matrix.pdf`](../niagara-ai-lab/niagara-protocol-capability-matrix.pdf) | 10-page deck — what oBIX and REST v2 each can and cannot do, the three-step publish flow per protocol, the traps that cost the most time, and how collection is proven |
-| [`../niagara-ai-lab/niagara-bacnet-server-points.md`](../niagara-ai-lab/niagara-bacnet-server-points.md) | Publishing station points as BACnet objects — enable order, `exportTable`, the three slots split across two channels, and the rename that follows an `objectId` write |
-| [`../niagara-ai-lab/niagara-modbus-server-points.md`](../niagara-ai-lab/niagara-modbus-server-points.md) | Publishing station points as Modbus registers — why `add` alone leaves a `NullProxyExt`, `dataAddress` versus `address`, and the `dataType` copy trap |
-| [`../niagara-ai-lab/niagara-obix-server-points.md`](../niagara-ai-lab/niagara-obix-server-points.md) | Publishing station points over oBIX — the `point` slot is writable by one channel only, plus what oBIX cannot do |
-| [`../niagara-ai-lab/niagara-client-collection.md`](../niagara-ai-lab/niagara-client-collection.md) | Collecting from field devices — four signals that report success without it, the two poll counters that settle the question, and the external write that is the only proof |
+| [`../niagara-ai-lab/README.md`](../niagara-ai-lab/README.md) | Index, the two-channel summary, the split into a server part and a client part, and the verification rules used throughout |
+| [`../niagara-ai-lab/part1-server/README.md`](../niagara-ai-lab/part1-server/README.md) | **Part 1 — publishing.** Station point → protocol object: the three-step pattern, what all three protocols share, what differs |
+| [`../niagara-ai-lab/part1-server/part1-publishing-points.pdf`](../niagara-ai-lab/part1-server/part1-publishing-points.pdf) | 9-page deck — object trees per protocol, the three-layer BACnet enable, the slots split across two channels, the Modbus slave trap, fault reference |
+| [`../niagara-ai-lab/part1-server/niagara-bacnet-server-points.md`](../niagara-ai-lab/part1-server/niagara-bacnet-server-points.md) | Publishing station points as BACnet objects — enable order, `exportTable`, the three slots split across two channels, and the rename that follows an `objectId` write |
+| [`../niagara-ai-lab/part1-server/niagara-obix-server-points.md`](../niagara-ai-lab/part1-server/niagara-obix-server-points.md) | Publishing station points over oBIX — the `point` slot is writable by one channel only, plus what oBIX cannot do |
+| [`../niagara-ai-lab/part1-server/niagara-modbus-server-points.md`](../niagara-ai-lab/part1-server/niagara-modbus-server-points.md) | Publishing station points as Modbus registers — why `add` alone leaves a `NullProxyExt`, `dataAddress` versus `address`, and the `dataType` copy trap |
+| [`../niagara-ai-lab/part2-client/README.md`](../niagara-ai-lab/part2-client/README.md) | **Part 2 — collecting.** The four-step client chain per protocol, the proxy-extension requirement, the slots to re-check after every copy |
+| [`../niagara-ai-lab/part2-client/part2-collecting-points.pdf`](../niagara-ai-lab/part2-client/part2-collecting-points.pdf) | 9-page deck — building the chain over the API, the client objects per protocol, four signals that lie, the two counters, the external-drive test, the open case |
+| [`../niagara-ai-lab/part2-client/niagara-client-collection.md`](../niagara-ai-lab/part2-client/niagara-client-collection.md) | Collecting from field devices — four signals that report success without it, the two poll counters that settle the question, and the external write that is the only proof |
 
 ## A note on the two editions' differences
 

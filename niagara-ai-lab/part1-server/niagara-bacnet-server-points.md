@@ -25,7 +25,7 @@ The `link` holds three `DynamicEnum` slots (`adapter`, `adapterId`, `ipAddress`)
 They **cannot be written over REST** — REST rejects them with
 `BEnumRange cannot be cast to BEnum`, and rejects the display name with `Illegal name`.
 The only working channel is an `oBIX PUT` of the **escaped** name taken from the slot's
-`~range`. The escape table is in the capability deck (`niagara-protocol-capability-matrix.pdf`).
+`~range`. The escape table is in the part deck (`part1-publishing-points.pdf`).
 
 ```
 GET  <obix>/config/Drivers/BacnetNetwork/bacnetComm/network/ipPort/link/adapter/~range
