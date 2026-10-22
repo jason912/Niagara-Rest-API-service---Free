@@ -5,10 +5,59 @@ interfaces** — no Workbench clicks, no desktop session. Everything here was re
 against a live station (Niagara `4.14.0.162`) and confirmed from the outside with
 independent Modbus, BACnet and SNMP clients.
 
-**Which rows are proven:** [`VERIFIED.md`](./VERIFIED.md) is the checklist. A tick means the
-capability was built over the API and confirmed off-station with an outside client or a
-counter delta. Rows without a tick are left blank on purpose — nothing in these documents
-claims them.
+**What is proven:** the checklist below marks every capability that was driven over the API
+and confirmed off-station. Blank rows are not claimed anywhere in this lab.
+
+## Verified checklist
+
+[`VERIFIED.md`](./VERIFIED.md) · [`VERIFIED.pdf`](./VERIFIED.pdf) — **26 of 32 capabilities
+verified**, 6 left blank.
+
+A tick means the capability was driven over the API and then observed from **outside** the
+station: an outside protocol client, or a counter delta across a known interval. A blank cell
+is not verified, and nothing in these documents claims it.
+
+### Part 1 — the station publishes points · 18 / 21
+
+| # | Capability | Protocol | ✓ |
+|:--|:--|:--|:--:|
+| 1.1 | Enable the driver network | BACnet/IP | ✓ |
+| 1.2 | Enable the IP port | BACnet/IP | ✓ |
+| 1.3 | Bind the port link to a real NIC | BACnet/IP | ✓ |
+| 1.4 | Server answers a Who-Is from another host | BACnet/IP | ✓ |
+| 1.5 | Create an export descriptor | BACnet/IP | ✓ |
+| 1.6 | Write `pointOrd` (a `BOrd` slot) | BACnet/IP | ✓ |
+| 1.7 | Write `objectId` and let the component rename | BACnet/IP | ✓ |
+| 1.8 | Create an export point | oBIX | ✓ |
+| 1.9 | Write the `point` slot (a `BOrd` slot) | oBIX | ✓ |
+| 1.10 | Read the export from outside | oBIX | ✓ |
+| 1.11 | Create a slave point | Modbus TCP slave | ✓ |
+| 1.12 | Bind the register | Modbus TCP slave | ✓ |
+| 1.13 | Read the register from outside | Modbus TCP slave | ✓ |
+| 1.14 | Write the register from outside | Modbus TCP slave | ✓ |
+| 1.15 | Component create / copy / rename / remove | all | ✓ |
+| 1.16 | Multi-operation edits in one request | all | ✓ |
+| 1.17 | Facet edit and read-back | all | ✓ |
+| 1.18 | Program source upload and compile | all | ✓ |
+| 1.19 | Read the exported object with ReadProperty | BACnet/IP |   |
+| 1.20 | Write through an oBIX export (`<value>/set/`) | oBIX |   |
+| 1.21 | SNMP agent exports | SNMP |   |
+
+### Part 2 — the station collects points · 8 / 11
+
+| # | Capability | Protocol | ✓ |
+|:--|:--|:--|:--:|
+| 2.1 | Create a client network | Modbus TCP | ✓ |
+| 2.2 | Create a client device | Modbus TCP | ✓ |
+| 2.3 | Set address, port and unit id | Modbus TCP | ✓ |
+| 2.4 | Create a point with its proxy extension | Modbus TCP | ✓ |
+| 2.5 | Set the register data type | Modbus TCP | ✓ |
+| 2.6 | Point carries a structured address | Modbus TCP | ✓ |
+| 2.7 | Scheduler is running | SNMP | ✓ |
+| 2.8 | Point value matches an outside read | SNMP | ✓ |
+| 2.9 | Point value matches an outside read | Modbus TCP |   |
+| 2.10 | Point collected and driven from outside | BACnet/IP |   |
+| 2.11 | Point collected from an oBIX server | oBIX |   |
 
 ## Two halves, opposite directions
 
@@ -53,6 +102,7 @@ Rule of thumb: **build with REST, bind with oBIX, prove with an outside client.*
 | Document | What it answers |
 |---|---|
 | [`VERIFIED.md`](./VERIFIED.md) | The checklist: every capability in this lab, ticked when it was confirmed off-station, blank when it was not |
+| [`VERIFIED.pdf`](./VERIFIED.pdf) | The same checklist as a 2-page A4 document, for review or print |
 | [`part1-server/README.md`](./part1-server/README.md) | Part 1 overview: the three-step publish pattern, what is common to all three protocols, what differs |
 | [`part1-server/part1-publishing-points.pdf`](./part1-server/part1-publishing-points.pdf) | 9-page deck: object trees, the three-layer BACnet enable, the slots split across two channels, the Modbus slave `PROXY` step |
 | [`part1-server/niagara-bacnet-server-points.md`](./part1-server/niagara-bacnet-server-points.md) | Exposing station points as BACnet objects: the enable chain, `exportTable`, the three slots split across two channels, the rename after `objectId` |
