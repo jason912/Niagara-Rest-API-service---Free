@@ -34,10 +34,18 @@ info:
     url: https://github.com/jason912/Niagara-Rest-API-service---Free/blob/main/LICENSE
 
 servers:
-  - url: http://<HOST>:8082
+  - url: "http://{host}:8082"
     description: v2 — authenticated (recommended)
-  - url: http://<HOST>:8081
+    variables:
+      host:
+        default: station.example.com
+        description: Station host name or IP address
+  - url: "http://{host}:8081"
     description: v1 — no authentication
+    variables:
+      host:
+        default: station.example.com
+        description: Station host name or IP address
 
 security:
   - basicAuth: []
