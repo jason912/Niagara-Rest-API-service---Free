@@ -337,7 +337,7 @@ with no Workbench clicks and no desktop session.
 | Half | Direction | Verified |
 |:--|:--|:--:|
 | [Part 1 — publishing](niagara-ai-lab/part1-server/) | station → BACnet / oBIX / Modbus objects | 18 / 21 |
-| [Part 2 — collecting](niagara-ai-lab/part2-client/) | field device → station points | 8 / 11 |
+| [Part 2 — collecting](niagara-ai-lab/part2-client/) | field device → station points | 11 / 11 |
 
 | Worked example | What was done over the API | Confirmed by |
 |:--|:--|:--|
@@ -352,7 +352,7 @@ station** — an independent client reading the same value, or a counter delta a
 interval. Rows that were not confirmed are left blank and are claimed nowhere.
 
 - [Lab index](niagara-ai-lab/README.md) — how the two halves fit together
-- [Checklist](niagara-ai-lab/VERIFIED.md) · [PDF](niagara-ai-lab/VERIFIED.pdf) — 26 of 32 ticked, the rest blank
+- [Checklist](niagara-ai-lab/VERIFIED.md) · [PDF](niagara-ai-lab/VERIFIED.pdf) — 29 of 32 ticked, the rest blank
 - [Publishing points](niagara-ai-lab/part1-server/part1-publishing-points.pdf) · [Collecting points](niagara-ai-lab/part2-client/part2-collecting-points.pdf) — 9 pages each
 
 What the lab settles in practice: **build with REST, bind with oBIX, prove with an outside

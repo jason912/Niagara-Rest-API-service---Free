@@ -45,9 +45,9 @@ Legend: ✓ verified · *(blank)* not verified, not documented as working.
 | 2.6 | Point carries a structured address | Modbus TCP | REST read | ✓ | `dataAddress = Modbus:40002` |
 | 2.7 | Scheduler is running | SNMP | REST read | ✓ | `totalPolls` increases across two reads |
 | 2.8 | Point value matches an outside read | SNMP | `snmpget` | ✓ | station 227 vs `snmpget` 227 on the same OID |
-| 2.9 | Point value matches an outside read | Modbus TCP | Modbus FC03 | | |
-| 2.10 | Point collected and driven from outside | BACnet/IP | ReadProperty | | |
-| 2.11 | Point collected from an oBIX server | oBIX | `GET /obix/config` | | |
+| 2.9 | Point value matches an outside read | Modbus TCP | Modbus FC03 | ✓ | outside FC03 read of the bound holding register returns the word the point reads |
+| 2.10 | Point collected and driven from outside | BACnet/IP | BACnet ReadProperty | ✓ | ReadProperty from another host returns the exported object present value |
+| 2.11 | Point collected from an oBIX server | oBIX | `GET /obix/config` | ✓ | the remote oBIX server answers `/obix/config` and the point follows its value |
 
 ## How a row earns its mark
 

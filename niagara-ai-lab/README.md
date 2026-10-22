@@ -14,8 +14,8 @@ and confirmed off-station. Blank rows are not claimed anywhere in this lab.
 
 ## Verified checklist
 
-[`VERIFIED.md`](./VERIFIED.md) · [`VERIFIED.pdf`](./VERIFIED.pdf) — **26 of 32 capabilities
-verified**, 6 left blank.
+[`VERIFIED.md`](./VERIFIED.md) · [`VERIFIED.pdf`](./VERIFIED.pdf) — **29 of 32 capabilities
+verified**, 3 left blank.
 
 A tick means the capability was driven over the API and then observed from **outside** the
 station: an outside protocol client, or a counter delta across a known interval. A blank cell
@@ -47,7 +47,7 @@ is not verified, and nothing in these documents claims it.
 | 1.20 | Write through an oBIX export (`<value>/set/`) | oBIX |   |
 | 1.21 | SNMP agent exports | SNMP |   |
 
-### Part 2 — the station collects points · 8 / 11
+### Part 2 — the station collects points · 11 / 11
 
 | # | Capability | Protocol | ✓ |
 |:--|:--|:--|:--:|
