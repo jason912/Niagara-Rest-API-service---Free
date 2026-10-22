@@ -20,6 +20,29 @@ really works instead of trusting a green status icon.
 A working deployment usually needs all three. The matrix below is the short
 version of what was measured.
 
+## Which action goes through which channel
+
+The guides are API-driven, but they are **not REST-only**. Component creation,
+copying, renaming, removal and facet edits all run over REST v2. Three kinds of
+slot cannot be written that way, and every result is confirmed from outside the
+station.
+
+| Action | Channel | Evidence |
+|---|---|---|
+| Create, copy, rename, remove components | **REST v2** — `add` / `cp` / `rename` / `remove` | the object appears in the parent's slot list |
+| Multi-step edits in one request | **REST v2** — `/api/batch`, 11 ops | one POST, all-or-nothing |
+| Facet strings (`units`, `precision`, `min`, `max`) | **REST v2** — `mod` with `N=facets` | the value renders with the new facet |
+| `objectName`, `objectId` on an export point | **REST v2** — `mod` | the slot read-back changes, and the component may self-rename |
+| Program source and compile | **REST v2** — `/api/program/*` | compile response |
+| Any `BOrd` slot — `pointOrd`, `point`, link targets | **Built-in XML API only** — PUT | REST rejects with `BString cannot be cast to BOrd` |
+| Any enum slot — `dataType`, `adapter`, `adapterId` | **Built-in XML API only** — PUT of the escaped name from `~range` | REST rejects with both `BEnumRange cannot be cast to BEnum` and `Illegal name` |
+| Slot lists, facets, alarm and log pages in UI shape | **box** — `POST /box/` | partial HTML |
+| Proving a point is exposed or collected | **Outside the station** — Modbus FC03/FC06, BACnet Who-Is plus ReadProperty, SNMP GET | an independent client sees the same value |
+
+Rule of thumb: **build with REST, bind with the XML API, prove with an outside client.**
+A status slot inside the station is never the evidence. The four signals that report
+success without delivering it are listed in the collection guide.
+
 ## Documents
 
 | Document | What it answers |
