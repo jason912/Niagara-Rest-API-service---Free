@@ -81,19 +81,6 @@ Anything that only looked correct in a status slot is called out as unproven.
   point stale while a freshly created equivalent device collects normally. The
   document records what was ruled out rather than guessing at a cause.
 
-## Build
-
-The deck is generated from source, so the PDF can be regenerated after an edit:
-
-```bash
-pip install reportlab pymupdf
-python3 build_deck.py     # writes niagara-protocol-capability-matrix.pdf
-```
-
-Fonts: the script uses DejaVu for Latin text and falls back to a CJK-capable
-font for the few glyphs that need it. Both are resolved from standard Linux font
-paths; adjust the constants at the top of the script for other systems.
-
 ---
 
 Shanghai Gline Net Co. · @jason912 · jason.zhang@gline-net.com
