@@ -1,9 +1,13 @@
-# Niagara AI Automation Lab
+# Driving a Niagara Station Through the API Only
 
-Hands-on notes from driving a Niagara 4 station **entirely through machine-facing
+Hands-on notes from running a Niagara 4 station **entirely through machine-facing
 interfaces** — no Workbench clicks, no desktop session. Everything here was reproduced
 against a live station (Niagara `4.14.0.162`) and confirmed from the outside with
-independent Modbus, BACnet and SNMP clients.
+independent Modbus, BACnet and OBIX clients plus SNMP.
+
+Two directions, both driven over HTTP: the station **publishes** its points as BACnet, oBIX
+and Modbus objects, and the station **collects** points from field devices. Each half has a
+checklist, a deck and the exact slots that had to be written.
 
 **What is proven:** the checklist below marks every capability that was driven over the API
 and confirmed off-station. Blank rows are not claimed anywhere in this lab.

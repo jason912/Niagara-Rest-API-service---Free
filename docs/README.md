@@ -64,7 +64,7 @@ editing, and alarm/history extension automation.
 | [`v2/glineRestApi-v2-facets.md`](v2/glineRestApi-v2-facets.md) · [PDF](v2/glineRestApi-v2-facets.pdf) | Editing facets over REST — the facet string, the two traps (`;` is the separator, a unit must be a `BUnit` not text), the unit names that resolve, and how to verify a facet write by its rendering |
 | [`v2/glineRestApi-v2-signature-timestamp.md`](v2/glineRestApi-v2-signature-timestamp.md) | Signature timestamps — what "not timestamped" means, why it matters once the signing certificate expires, how to add and verify one, and why timestamping must be the last step (it changes the hashes) |
 
-## AI automation lab
+## Driving a station through the API only
 
 Worked through the API only — no desktop session — against a live station. Each guide ends in
 an outside-client verification, so a claim can be re-tested instead of trusted.

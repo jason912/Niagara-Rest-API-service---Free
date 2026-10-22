@@ -328,6 +328,39 @@ Full report: [docs/v2/glineRestApi-v2-Test-Report.md](docs/v2/glineRestApi-v2-Te
 
 ---
 
+## Proof: a station driven through the API only
+
+The report above proves the endpoints work. This proves the module is enough to **run a real
+station**: on a live Niagara 4.14 station, points were published and collected through the API
+with no Workbench clicks and no desktop session.
+
+| Half | Direction | Verified |
+|:--|:--|:--:|
+| [Part 1 — publishing](niagara-ai-lab/part1-server/) | station → BACnet / oBIX / Modbus objects | 18 / 21 |
+| [Part 2 — collecting](niagara-ai-lab/part2-client/) | field device → station points | 8 / 11 |
+
+| Worked example | What was done over the API | Confirmed by |
+|:--|:--|:--|
+| BACnet/IP server | three-layer enable, export descriptor, `pointOrd`, rename after `objectId` | Who-Is + ReadProperty from another host |
+| oBIX server | export point, `point` slot, `/set/` writes | an outside oBIX read |
+| Modbus TCP slave | slave point, register bind, `dataType` | FC03 / FC06 from an outside client |
+| Modbus TCP client | network, device, point + proxy extension, register decode | the point matches an outside read |
+| SNMP | agent export, scheduler running | GET plus a poll-counter delta |
+
+A tick means the capability was built over the API and then observed **from outside the
+station** — an independent client reading the same value, or a counter delta across a known
+interval. Rows that were not confirmed are left blank and are claimed nowhere.
+
+- [Lab index](niagara-ai-lab/README.md) — how the two halves fit together
+- [Checklist](niagara-ai-lab/VERIFIED.md) · [PDF](niagara-ai-lab/VERIFIED.pdf) — 26 of 32 ticked, the rest blank
+- [Publishing points](niagara-ai-lab/part1-server/part1-publishing-points.pdf) · [Collecting points](niagara-ai-lab/part2-client/part2-collecting-points.pdf) — 9 pages each
+
+What the lab settles in practice: **build with REST, bind with oBIX, prove with an outside
+client.** The REST encoder cannot carry `BOrd` or enum slots; oBIX can, but cannot create a
+component. Using one alone leaves the job half done.
+
+---
+
 ## Comparison (by channel)
 
 A capability overview across the common ways to talk to a station over HTTP.
@@ -386,8 +419,6 @@ HTTP with no license fee — and pairs with oBIX for alarms and history.
 | [v2 Comparison](docs/v2/glineRestApi-v2-comparison.pdf) | v2 vs the other channels |
 | [v2 What's New](docs/v2/glineRestApi-v2-whatsnew.pdf) | What v2 adds over v1 |
 | [v2 Test Report](docs/v2/glineRestApi-v2-Test-Report.md) | v2 — 40/40 use cases passed |
-| [AI automation lab](niagara-ai-lab/README.md) | Driving a station through the API only — split into [Part 1: publishing points](niagara-ai-lab/part1-server/) (BACnet / oBIX / Modbus servers) and [Part 2: collecting points](niagara-ai-lab/part2-client/) (clients, proxy extensions, proof of collection) |
-| [Lab checklist](niagara-ai-lab/VERIFIED.md) · [PDF](niagara-ai-lab/VERIFIED.pdf) | Which capabilities were built over the API and confirmed off-station — 26 of 32 ticked, the rest left blank |
 | [CHANGELOG](CHANGELOG.md) | What each v2 version adds (v2.0 → v2.4.0) |
 
 ---
