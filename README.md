@@ -15,6 +15,8 @@ See [ABOUT_THIS_JAR.md](ABOUT_THIS_JAR.md) if you are unsure which edition you h
 >
 > **Latest v2: [v2.4.0](CHANGELOG.md)** · see the [CHANGELOG](CHANGELOG.md) for per-version details.
 
+⭐ If this saves you time, a star helps other integrators find it.
+
 ---
 
 ## Two Editions
@@ -28,6 +30,7 @@ See [ABOUT_THIS_JAR.md](ABOUT_THIS_JAR.md) if you are unsure which edition you h
 | **Facet Editing** | — | ✅ Write facets (incl. enum ranges), read slot facets |
 | **Batch Operations** | ✅ | ✅ |
 | **Component Lifecycle** | ✅ | ✅ |
+| **Intended use** | Commissioning, lab and template work | Production deployments, multi-user or cross-network access |
 | **Port** | 8081 | 8082 |
 
 Both editions are **independent modules** and can run side by side.
@@ -37,6 +40,17 @@ Both editions are **independent modules** and can run side by side.
 ## What Is It?
 
 A lightweight REST API module for Niagara N4 stations. **v1** exposes a JSON-over-HTTP endpoint for **11 batch operations** — create, read, update, delete, copy, rename, duplicate, link, unlink, list, and invoke — all through a single `POST /api/batch` call.
+
+**Direction — inbound.** The module is an HTTP **server that runs inside the station**. External tools call in; the station does not call out. Nothing needs to be installed on the client side, and no outbound connection is made by the module.
+
+```mermaid
+flowchart LR
+    A["External caller<br/>script · CI/CD · Node-RED · AI agent"] -->|HTTP · POST /api/batch| B["RestApiService<br/>inside the station<br/>:8081 v1 · :8082 v2"]
+    B --> C["Station component tree<br/>points · links · programs · facets"]
+    B -->|GET| D["status · modules · types · config"]
+```
+
+So the typical question is not "how does the station reach my system", but "how does my system reach the station" — one HTTP endpoint, JSON in, JSON out.
 
 **v2** adds a mandatory authentication layer plus query and program-management capabilities, for deployments that require controlled access.
 
@@ -201,22 +215,49 @@ We will send the latest build (`glineRestApi-rt.jar`) with installation notes.
 
 ---
 
-## Quick Start
+## Quick Start (5 minutes)
 
 ### v1 · niagaraRestApi (in this repo, port 8081)
 
 **Download:** [`niagaraRestApi-rt.jar`](niagaraRestApi-rt.jar) — this is the **v1** module.
 
 ```bash
-# 1. Add niagaraRestApi-rt.jar to your modules/ directory
-# 2. Restart station
-# 3. The REST API is now live on port 8081 (configurable)
-
-# Test it:
-curl -X POST http://your-station:8081/api/batch \
-  -H "Content-Type: application/json" \
-  -d '[{"OP":"LIST","PATH":"Drivers"}]'
+# 1. Drop the jar into the station's modules/ directory
+#    <NiagaraHome>/modules/niagaraRestApi-rt.jar
+# 2. Restart the station so the module loads
+# 3. The service is then live on its port (default 8081)
 ```
+
+**First call — confirm the service is running:**
+
+```bash
+curl -s "http://<HOST>:8081/api/status"
+```
+
+```json
+{"status":"ok","name":"niagaraRestApi","port":8081}
+```
+
+**Second call — list what is under a folder:**
+
+```bash
+curl -s -X POST "http://<HOST>:8081/api/batch" \
+  -H "Content-Type: application/json" \
+  -d '[{"OP":"list","PATH":"/Drivers"}]'
+```
+
+```json
+[{"OP":"list","path":"/Drivers","children":[{"name":"...","type":"..."}],"status":"ok"}]
+```
+
+`children` carries one entry per child component. That is the whole handshake. Every write in v1 goes through the same endpoint —
+see [11 batch operations](#batch-operations-11-ops-all-via-post-apibatch) and the
+[v1 guide](docs/v1/niagaraRestApi-v1-guide.pdf).
+
+**If the call does not answer:** check the component's `enabled` and `port` slots
+in Workbench, confirm the station restarted after the jar was copied, and confirm
+the client machine can reach the station on that port (`curl -v` shows whether it
+is a connection or a response problem).
 
 ### v2 · glineRestApi (on request, port 8082)
 
@@ -224,7 +265,7 @@ curl -X POST http://your-station:8081/api/batch \
 # Every request is authenticated:
 curl -u "USER:PASS" -X POST http://your-station:8082/api/batch \
   -H "Content-Type: application/json" \
-  -d '[{"OP":"LIST","PATH":"Drivers"}]'
+  -d '[{"OP":"list","PATH":"/Drivers"}]'
 ```
 
 > **v2 requires authentication on every request** (Basic Auth + optional CIDR allow-list), configurable in the station.
