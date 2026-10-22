@@ -42,13 +42,15 @@ status = {fault}        ← expected; nothing is bound yet
 
 ## 2. Bind the source point — oBIX only
 
-`point` is a `BOrd` slot. Three channels were tried against it:
+`point` is a `BOrd` slot. Two channels were tried against it:
 
 | Channel | Result |
 |:--|:--|
 | REST `mod` with `V="station:\|slot:/Demo/Temp1"` | `javax.baja.sys.BString cannot be cast to javax.baja.naming.BOrd` |
-| box `set({slot:'point', value: baja.Ord.make(...)})` | returns OK, **value stays null** — silent failure |
 | **oBIX `PUT` `<uri>`** | **succeeds** |
+
+oBIX is the only channel that can write this slot. The REST batch cannot carry a
+`BOrd`, and no number of retries changes the encoder.
 
 ```bash
 curl -X PUT "http://<HOST>/obix/config/Drivers/ObixNetwork/exports/demo_num1/point/" \
@@ -141,8 +143,9 @@ REST.
 - **A proxied point's `set` node is inert.** The node is published, the write is accepted,
   the value does not move. This is an oBIX mapping limitation for proxied points, not an
   authentication problem — a normal point written with the same credentials works.
-- **`<real null="true"/>` is rejected.** oBIX cannot clear a priority slot; only the box
-  channel can (see the box document).
+- **`<real null="true"/>` is rejected.** oBIX cannot clear a priority slot to true null,
+  and neither can REST. Both leave the slot occupied: the value is gone, the priority
+  stays. Plan the workflow so a slot never has to be emptied.
 - **`#` in a path must be escaped as `$23`**, and other reserved characters follow the
   `$xx` convention used by DynamicEnum names.
 

@@ -145,8 +145,8 @@ Recorded here because it is the documented way to drive capture setup over HTTP 
 - `timeDelay` (`RelTime`) is written as a **raw millisecond number** (`5000`), not `"5s"`.
 - `historyName` / `toOffnormalText` (`BFormat`) and `alarmEnable` (`AlarmTransitionBits`)
   are **not** writable via `MOD` — a property-type limit, not an API limit.
-- Reading the collected *data* back is a separate topic: use the station's **Web Box**
-  (`/wsbox/query/data/`) — see the guide.
+- Reading the collected *data* back is a separate topic: it is queried over **oBIX**
+  (`/obix/config/...`) — see the guide.
 
 ---
 

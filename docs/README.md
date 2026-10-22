@@ -48,7 +48,7 @@ no alarm/history query.
 
 | Document | What it covers |
 |:--|:--|
-| [`v2/glineRestApi-v2-guide.pdf`](v2/glineRestApi-v2-guide.pdf) | Authentication, endpoints, 11 batch ops + BQL, program endpoints, facet editing, alarm/history extension setup, reading data via Web Box, limitations |
+| [`v2/glineRestApi-v2-guide.pdf`](v2/glineRestApi-v2-guide.pdf) | Authentication, endpoints, 11 batch ops + BQL, program endpoints, facet editing, alarm/history extension setup, reading data over oBIX, limitations |
 | [`v2/glineRestApi-v2-comparison.pdf`](v2/glineRestApi-v2-comparison.pdf) | v2 against the other channels, including the extension-automation capability |
 | [`v2/glineRestApi-v2-whatsnew.pdf`](v2/glineRestApi-v2-whatsnew.pdf) | Release deck — what v2 adds over v1 |
 | [`v2/glineRestApi-v2-Test-Report.md`](v2/glineRestApi-v2-Test-Report.md) | The 40 verified test cases (29 functional + 11 access-control) |
@@ -71,11 +71,11 @@ an outside-client verification, so a claim can be re-tested instead of trusted.
 
 | Document | What it covers |
 |:--|:--|
-| [`../niagara-ai-lab/README.md`](../niagara-ai-lab/README.md) | Index, the three-channel summary, and the verification rules used throughout |
-| [`../niagara-ai-lab/niagara-protocol-capability-matrix.pdf`](../niagara-ai-lab/niagara-protocol-capability-matrix.pdf) | 10-page deck — what v2, the built-in XML API and the box channel each can and cannot do, the three-step publish flow per protocol, and how collection is proven |
+| [`../niagara-ai-lab/README.md`](../niagara-ai-lab/README.md) | Index, the two-channel summary, and the verification rules used throughout |
+| [`../niagara-ai-lab/niagara-protocol-capability-matrix.pdf`](../niagara-ai-lab/niagara-protocol-capability-matrix.pdf) | 10-page deck — what oBIX and REST v2 each can and cannot do, the three-step publish flow per protocol, the traps that cost the most time, and how collection is proven |
 | [`../niagara-ai-lab/niagara-bacnet-server-points.md`](../niagara-ai-lab/niagara-bacnet-server-points.md) | Publishing station points as BACnet objects — enable order, `exportTable`, the three slots split across two channels, and the rename that follows an `objectId` write |
 | [`../niagara-ai-lab/niagara-modbus-server-points.md`](../niagara-ai-lab/niagara-modbus-server-points.md) | Publishing station points as Modbus registers — why `add` alone leaves a `NullProxyExt`, `dataAddress` versus `address`, and the `dataType` copy trap |
-| [`../niagara-ai-lab/niagara-obix-server-points.md`](../niagara-ai-lab/niagara-obix-server-points.md) | Publishing station points through the built-in XML API — the `point` slot is writable by one channel only, plus what that channel cannot do |
+| [`../niagara-ai-lab/niagara-obix-server-points.md`](../niagara-ai-lab/niagara-obix-server-points.md) | Publishing station points over oBIX — the `point` slot is writable by one channel only, plus what oBIX cannot do |
 | [`../niagara-ai-lab/niagara-client-collection.md`](../niagara-ai-lab/niagara-client-collection.md) | Collecting from field devices — four signals that report success without it, the two poll counters that settle the question, and the external write that is the only proof |
 
 ## A note on the two editions' differences

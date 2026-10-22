@@ -141,9 +141,9 @@ curl -u "<USER>:<PASS>" -X POST http://your-station:8082/api/batch \
 Extensions created over REST stay fully visible and editable in Workbench.
 
 **Reading the collected data** — the REST API has no alarm/history *query* endpoint by
-design; that part is read through the station's **Web Box** feature
-(`/wsbox/query/data/<ord>` and friends), which is automatable too. See the
-[v2 REST API Guide](docs/v2/glineRestApi-v2-guide.pdf) for the full procedure.
+design; that part is read over **oBIX**, which is automatable too. See the
+[oBIX point guide](niagara-ai-lab/niagara-obix-server-points.md) for the query endpoints
+and the slot-binding rules.
 
 #### 🆕 Facet Editing (v2.4)
 
@@ -291,7 +291,7 @@ Full report: [docs/v2/glineRestApi-v2-Test-Report.md](docs/v2/glineRestApi-v2-Te
 
 A capability overview across the common ways to talk to a station over HTTP.
 
-| Feature | **Gline REST API** | Built-in XML API | Third-party connector | Built-in REST |
+| Feature | **Gline REST API** | oBIX | Third-party connector | Built-in REST |
 |---------|:------------------:|:----------------:|:---------------------:|:-------------:|
 | Atomic batch (11 ops, single POST) | ✅ | ❌ | ❌ | ❌ |
 | Deep Copy + link rebuild | ✅ | ❌ | ❌ | ❌ |
@@ -314,12 +314,12 @@ A capability overview across the common ways to talk to a station over HTTP.
 | Alarm & history extension setup (attach + activate) | **Gline REST API** (`POST /api/batch`) |
 | Facet editing (units, ranges, precision) | **Gline REST API** (v2.4) |
 | Component lifecycle automation | **Gline REST API** |
-| Reading trend / alarm *data* | Built-in XML API, or Web Box (`/wsbox/query/data/`) |
+| Reading trend / alarm *data* | **oBIX** (`/obix/config/...`) |
 | External API data ingestion | Third-party connector |
 | Production security | **Gline REST API v2** (built-in auth + CIDR allow-list) — no reverse proxy needed |
 
 **Bottom line:** Gline REST API covers the component lifecycle, queries, and facets over
-HTTP with no license fee — and pairs with the built-in XML API for alarms and history.
+HTTP with no license fee — and pairs with oBIX for alarms and history.
 
 ---
 
@@ -345,7 +345,7 @@ HTTP with no license fee — and pairs with the built-in XML API for alarms and 
 | [v2 Comparison](docs/v2/glineRestApi-v2-comparison.pdf) | v2 vs the other channels |
 | [v2 What's New](docs/v2/glineRestApi-v2-whatsnew.pdf) | What v2 adds over v1 |
 | [v2 Test Report](docs/v2/glineRestApi-v2-Test-Report.md) | v2 — 40/40 use cases passed |
-| [AI automation lab](niagara-ai-lab/README.md) | Driving a station through the API only — capability deck, BACnet / Modbus / XML-API point publishing, and how collection is proven |
+| [AI automation lab](niagara-ai-lab/README.md) | Driving a station through the API only — capability deck, BACnet / Modbus / oBIX point publishing, and how collection is proven |
 | [CHANGELOG](CHANGELOG.md) | What each v2 version adds (v2.0 → v2.4.0) |
 
 ---
