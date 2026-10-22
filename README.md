@@ -345,6 +345,7 @@ HTTP with no license fee — and pairs with the built-in XML API for alarms and 
 | [v2 Comparison](docs/v2/glineRestApi-v2-comparison.pdf) | v2 vs the other channels |
 | [v2 What's New](docs/v2/glineRestApi-v2-whatsnew.pdf) | What v2 adds over v1 |
 | [v2 Test Report](docs/v2/glineRestApi-v2-Test-Report.md) | v2 — 40/40 use cases passed |
+| [AI automation lab](niagara-ai-lab/README.md) | Driving a station through the API only — capability deck, BACnet / Modbus / XML-API point publishing, and how collection is proven |
 | [CHANGELOG](CHANGELOG.md) | What each v2 version adds (v2.0 → v2.4.0) |
 
 ---

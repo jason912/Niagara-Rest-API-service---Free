@@ -64,6 +64,20 @@ editing, and alarm/history extension automation.
 | [`v2/glineRestApi-v2-facets.md`](v2/glineRestApi-v2-facets.md) · [PDF](v2/glineRestApi-v2-facets.pdf) | Editing facets over REST — the facet string, the two traps (`;` is the separator, a unit must be a `BUnit` not text), the unit names that resolve, and how to verify a facet write by its rendering |
 | [`v2/glineRestApi-v2-signature-timestamp.md`](v2/glineRestApi-v2-signature-timestamp.md) | Signature timestamps — what "not timestamped" means, why it matters once the signing certificate expires, how to add and verify one, and why timestamping must be the last step (it changes the hashes) |
 
+## AI automation lab
+
+Worked through the API only — no desktop session — against a live station. Each guide ends in
+an outside-client verification, so a claim can be re-tested instead of trusted.
+
+| Document | What it covers |
+|:--|:--|
+| [`../niagara-ai-lab/README.md`](../niagara-ai-lab/README.md) | Index, the three-channel summary, and the verification rules used throughout |
+| [`../niagara-ai-lab/niagara-protocol-capability-matrix.pdf`](../niagara-ai-lab/niagara-protocol-capability-matrix.pdf) | 10-page deck — what v2, the built-in XML API and the box channel each can and cannot do, the three-step publish flow per protocol, and how collection is proven |
+| [`../niagara-ai-lab/niagara-bacnet-server-points.md`](../niagara-ai-lab/niagara-bacnet-server-points.md) | Publishing station points as BACnet objects — enable order, `exportTable`, the three slots split across two channels, and the rename that follows an `objectId` write |
+| [`../niagara-ai-lab/niagara-modbus-server-points.md`](../niagara-ai-lab/niagara-modbus-server-points.md) | Publishing station points as Modbus registers — why `add` alone leaves a `NullProxyExt`, `dataAddress` versus `address`, and the `dataType` copy trap |
+| [`../niagara-ai-lab/niagara-obix-server-points.md`](../niagara-ai-lab/niagara-obix-server-points.md) | Publishing station points through the built-in XML API — the `point` slot is writable by one channel only, plus what that channel cannot do |
+| [`../niagara-ai-lab/niagara-client-collection.md`](../niagara-ai-lab/niagara-client-collection.md) | Collecting from field devices — four signals that report success without it, the two poll counters that settle the question, and the external write that is the only proof |
+
 ## A note on the two editions' differences
 
 The editions differ in ways that matter when reading documentation, so they are never mixed:
