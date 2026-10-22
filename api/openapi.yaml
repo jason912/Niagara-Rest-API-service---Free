@@ -1,0 +1,585 @@
+openapi: 3.1.0
+
+info:
+  title: Niagara REST API
+  version: "2.4.0"
+  summary: >-
+    HTTP API for Niagara 4 stations — batch component operations, BQL queries,
+    program management and facet editing.
+  description: |
+    This module runs **inside** the station. External callers connect in; the module
+    never calls out. Two editions share this contract:
+
+    | Edition | Port | Auth |
+    |:--|:--|:--|
+    | v1 `niagaraRestApi` | 8081 | none |
+    | v2 `glineRestApi` | 8082 | Basic Auth + optional CIDR allow-list |
+
+    Most work goes through `POST /api/batch`: one request carries an ordered array of
+    operations, and the response carries one result per operation **in the same order**.
+    If operation 3 fails, operations 1 and 2 have already been applied — there is no
+    rollback, so keep batches small enough to reason about.
+
+    Two slots cannot be written through this API: `BOrd` slots (`pointOrd`, `point`,
+    link targets) and enum slots (`dataType`, `adapter`, `adapterId`). Use oBIX `PUT`
+    for those. Everything else — create, copy, rename, remove, modify, link — belongs here.
+
+    Operands are case-insensitive: `OP`, `PATH` and `op`, `path` are equivalent.
+  contact:
+    name: Shanghai Gline Net Co., Ltd.
+    email: jason.zhang@gline-net.com
+    url: https://github.com/jason912
+  license:
+    name: MIT
+    url: https://github.com/jason912/Niagara-Rest-API-service---Free/blob/main/LICENSE
+
+servers:
+  - url: http://<HOST>:8082
+    description: v2 — authenticated (recommended)
+  - url: http://<HOST>:8081
+    description: v1 — no authentication
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: Service
+    description: Status and capability probes
+  - name: Station
+    description: Reading the station tree
+  - name: Batch
+    description: Component operations, one POST
+  - name: Program
+    description: Program source and slots (v2 only)
+
+paths:
+  /api/status:
+    get:
+      tags: [Service]
+      summary: Service status
+      description: >-
+        Liveness probe. On v2 this endpoint also requires credentials once auth is
+        configured.
+      operationId: getStatus
+      security:
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, name, port]
+                properties:
+                  status:
+                    type: string
+                    const: ok
+                  name:
+                    type: string
+                    examples: [glineRestApi, niagaraRestApi]
+                  version:
+                    type: string
+                    examples: ["2.0"]
+                  port:
+                    type: integer
+                    examples: [8082]
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/modules:
+    get:
+      tags: [Service]
+      summary: Module probe
+      description: >-
+        Informational stub. It returns a pointer, not a module list — use
+        `/api/config` or a BQL query to enumerate components.
+      operationId: getModules
+      responses:
+        "200":
+          description: Informational message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  note:
+                    type: string
+                    examples: ["use /api/config to browse station tree"]
+
+  /api/types:
+    get:
+      tags: [Service]
+      summary: Type probe
+      description: >-
+        Informational stub. It returns a hint listing common type names, not a full
+        enumeration — browse `/api/config` for the real types on a station.
+      operationId: getTypes
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Free-text hint, e.g. `NumericWritable`
+          examples:
+            NumericWritable:
+              value: NumericWritable
+      responses:
+        "200":
+          description: Informational message with common type names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  note:
+                    type: string
+
+  /api/config:
+    get:
+      tags: [Station]
+      summary: Browse the station tree
+      description: >-
+        Read one component and its immediate children. This is the read side of the
+        station tree; `POST /api/batch` with `list` gives the same child list as part
+        of a larger batch.
+      operationId: getConfig
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Slot path beginning with `/`
+          examples:
+            root:
+              value: /
+      responses:
+        "200":
+          description: Component found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComponentNode"
+        "400":
+          description: Path not found
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [error]
+                properties:
+                  error:
+                    type: string
+                    examples: ["Path 'TCASE1' not found under station"]
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/batch:
+    post:
+      tags: [Batch]
+      summary: Run an ordered array of operations
+      description: |
+        One request, one result per operation, results in request order.
+
+        Batch semantics worth knowing before you build on it:
+
+        - Operations run **sequentially** in the array, so a later `mod` can act on a
+          component created by an earlier `add` in the same request.
+        - There is **no transaction** and **no rollback**. A failure at index 3 leaves
+          indices 0–2 applied.
+        - Each result carries its own `status`; the HTTP status describes the request,
+          not the individual operations.
+        - `rename` preserves handle-based link ORDs, which is why it exists as its own
+          operation instead of remove-and-recreate.
+      operationId: postBatch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              minItems: 1
+              items:
+                $ref: "#/components/schemas/Operation"
+            examples:
+              createModifyRead:
+                summary: Create, write, then read back — one request
+                value:
+                  - OP: add
+                    PATH: /DemoFolder
+                    T: control:NumericWritable
+                    N: SupplyTemp
+                  - OP: mod
+                    PATH: /DemoFolder/SupplyTemp
+                    N: out
+                    V: "21.5"
+                  - OP: read
+                    PATH: /DemoFolder/SupplyTemp
+                    N: out
+              linkPoints:
+                summary: Link two points with automatic type conversion
+                value:
+                  - OP: link
+                    PATH: /DemoFolder/SupplyTemp
+                    N: out
+                    TARGET: /DemoFolder/Setpoint
+                    TARGET_N: in16
+              rename:
+                summary: Rename without breaking links
+                value:
+                  - OP: rename
+                    PATH: /DemoFolder/SupplyTemp
+                    NEW: ZoneTemp
+              query:
+                summary: BQL to a structured table (v2)
+                value:
+                  - OP: bql
+                    Q: select name,slotPath,out from control:NumericWritable
+                    SCOPE: /Drivers
+                    LIMIT: "10"
+      responses:
+        "200":
+          description: One result per operation, in request order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OperationResult"
+        "400":
+          description: Malformed batch body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "405":
+          description: Wrong method
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/program/write:
+    post:
+      tags: [Program]
+      summary: Write program source
+      description: >-
+        Replaces the program's source. Follow with `/api/program/compile`; the source is
+        not compiled merely by being written.
+      operationId: writeProgram
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path, source]
+              properties:
+                path:
+                  type: string
+                  description: Program component path
+                  examples: [/Programs/Demo1]
+                source:
+                  type: string
+                  description: Full Java source, newlines included
+      responses:
+        "200":
+          description: Source written
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchResult"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/program/addslot:
+    post:
+      tags: [Program]
+      summary: Add a program slot
+      description: Adds a slot of the given component type to a program.
+      operationId: addProgramSlot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path, name, type]
+              properties:
+                path:
+                  type: string
+                  examples: [/Programs/Demo1]
+                name:
+                  type: string
+                  examples: [MySlot]
+                type:
+                  type: string
+                  description: Fully qualified type name
+                  examples: [control:NumericWritable]
+      responses:
+        "200":
+          description: Slot added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchResult"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/program/compile:
+    post:
+      tags: [Program]
+      summary: Compile the program
+      description: Compiles the program at `path`. This is the step that turns source into a running class.
+      operationId: compileProgram
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path:
+                  type: string
+                  examples: [/Programs/Demo1]
+      responses:
+        "200":
+          description: Compile result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchResult"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/program/status:
+    get:
+      tags: [Program]
+      summary: Program status
+      description: Class name, status, checksum and source length.
+      operationId: getProgramStatus
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          examples:
+            demo:
+              value: /Programs/Demo1
+      responses:
+        "200":
+          description: Program status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path:
+                    type: string
+                  class:
+                    type: string
+                  status:
+                    type: string
+                  checksum:
+                    type: string
+                  sourceLength:
+                    type: integer
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: >-
+        v2 only. Configure with `mod` on the service component (`authUser`, `authPass`),
+        optionally restricted by `allowCidr`. Credentials are sent on every request.
+
+  responses:
+    Unauthorized:
+      description: Missing or wrong credentials (v2)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: Source address outside the CIDR allow-list (v2)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        status:
+          type: string
+
+    ComponentNode:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          description: Simple type name
+        slots:
+          type: array
+          description: Child components, as `name` / `type` pairs
+          items:
+            $ref: "#/components/schemas/ChildRef"
+        children:
+          type: array
+          description: Same list as `slots`, under the name most callers expect
+          items:
+            $ref: "#/components/schemas/ChildRef"
+
+    ChildRef:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+
+    Operation:
+      description: |
+        One operation. `OP` selects the shape; the remaining fields depend on it.
+
+        | OP | Required | Meaning |
+        |:--|:--|:--|
+        | `add` | `PATH`, `T`, `N` | create component `N` of type `T` under `PATH` |
+        | `add` + `PROXY` | `PROXY` | also create the driver proxy extension at creation time |
+        | `mod` | `PATH`, `N`, `V` | write value `V` into slot `N` |
+        | `read` | `PATH`, `N` or `SLOT` | read one slot |
+        | `list` | `PATH` | immediate children |
+        | `rename` | `PATH`, `NEW` | rename, links preserved |
+        | `cp` | `PATH`, `N` | deep copy to sibling name `N` |
+        | `duplicate` | `PATH` | deep copy with an auto `_copy` suffix |
+        | `link` | `PATH`, `N`, `TARGET`, `TARGET_N` | `PATH.N` → `TARGET.TARGET_N` |
+        | `unlink` | `TARGET` | remove the link child from the target |
+        | `remove` | `PATH` | delete component |
+        | `invoke` | `PATH`, `N` | run action `N` |
+        | `bql` | `Q` | run BQL; optional `SCOPE`, `LIMIT` (v2 only) |
+
+        `PROXY` matters for one specific reason: a client point created without its proxy
+        extension cannot collect data, and adding the extension afterwards is an extra
+        step that is easy to forget. Supply `PROXY` at creation and the point is complete.
+      type: object
+      required: [OP]
+      properties:
+        OP:
+          type: string
+          enum: [add, mod, read, list, rename, cp, duplicate, link, unlink, remove, invoke, bql]
+          description: Operation name (case-insensitive)
+        PATH:
+          type: string
+          description: Parent path for `add`, target path otherwise
+        T:
+          type: string
+          description: Fully qualified component type, e.g. `control:NumericWritable`
+        N:
+          type: string
+          description: New component name for `add`/`cp`; slot name for `mod`/`read`/`link`; action name for `invoke`
+        V:
+          type: [string, number, boolean]
+          description: >-
+            Value for `mod`. Numbers and booleans may be sent as native JSON or as
+            strings. `RelTime` slots take raw milliseconds (`5000`), not `"5s"`.
+        SLOT:
+          type: string
+          description: Slot name for `read`, alternative to `N`
+        NEW:
+          type: string
+          description: New name for `rename`
+        TARGET:
+          type: string
+          description: Target component for `link`/`unlink`
+        TARGET_N:
+          type: string
+          description: Target slot for `link`
+        PROXY:
+          type: string
+          description: >-
+            Proxy extension type to create alongside the point,
+            e.g. `modbusCore:ModbusClientNumericProxyExt`
+        Q:
+          type: string
+          description: BQL statement (`bql` only, v2)
+        SCOPE:
+          type: string
+          description: BQL scope path (`bql` only)
+        LIMIT:
+          type: [string, integer]
+          description: BQL row limit (`bql` only)
+
+    OperationResult:
+      type: object
+      properties:
+        OP:
+          type: string
+        status:
+          type: string
+          description: "`ok`, `unknown` or an error string"
+        name:
+          type: string
+          description: Present for `add`, `cp`, `duplicate`
+        path:
+          type: string
+          description: Present for `mod`, `read`, `list`
+        N:
+          type: string
+          description: Echoed slot name for `mod`/`read`
+        value:
+          type: string
+          description: >-
+            Present for `read`. Carries the status marker inside the string, e.g.
+            `42.50 {ok}` or `- {null}`.
+        children:
+          type: array
+          description: Present for `list`
+          items:
+            $ref: "#/components/schemas/ChildRef"
+        columns:
+          type: array
+          description: Present for `bql`
+          items:
+            type: string
+        rows:
+          type: array
+          description: Present for `bql`
+          items:
+            type: object
+            additionalProperties: true
+        count:
+          type: integer
+          description: Present for `bql`
+        ord:
+          type: string
+          description: Present for `bql` — the resolved query ord
+        action:
+          type: string
+          description: Present for `invoke`
+        error:
+          type: string
+
+    BatchResult:
+      type: object
+      properties:
+        status:
+          type: string
+        error:
+          type: string

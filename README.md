@@ -420,6 +420,8 @@ HTTP with no license fee — and pairs with oBIX for alarms and history.
 | [v2 What's New](docs/v2/glineRestApi-v2-whatsnew.pdf) | What v2 adds over v1 |
 | [v2 Test Report](docs/v2/glineRestApi-v2-Test-Report.md) | v2 — 40/40 use cases passed |
 | [CHANGELOG](CHANGELOG.md) | What each v2 version adds (v2.0 → v2.4.0) |
+| [OpenAPI spec](api/openapi.yaml) | Machine-readable contract — every endpoint, every `OP`, every field. Import into Postman/Insomnia, or generate a client |
+| [examples/batch_build.py](examples/batch_build.py) | 152-line Python client, standard library only. Builds a folder of points, links them, reads them back. `--dry-run` prints the requests without touching a station |
 
 ---
 
