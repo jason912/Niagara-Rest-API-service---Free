@@ -1,31 +1,33 @@
 # Exposing station points as BACnet objects
 
 **Applies to** Niagara N4 (verified on 4.14.0.162) with `BACnetNetwork` present.
-**Companion:** [BACnet/IP server enablement](#prerequisite-the-server-must-be-running) below —
-a correctly built export object still reads as `{fault}` if the server itself is not up.
 
 This document covers one direction only: **station point → BACnet object visible to an
-external BACnet client**. Reading BACnet devices into a station is a different driver
-(`BACnetNetwork` device objects) and is not covered here.
+external BACnet client**. Reading BACnet devices into a station is the client direction and
+is covered in [`../part2-client/`](../part2-client/).
+
+The verified rows of this document are marked in [`../VERIFIED.md`](../VERIFIED.md).
 
 ---
 
-## Prerequisite: the server must be running
+## Step 0: bring the server up
 
-Three layers must all be enabled. Enabling only `ipPort` produces `status={ok}` on that
-component while nothing answers on the wire.
+Three layers are enabled, in this order. Each layer is confirmed by a read-back before the
+next one is touched.
 
-| Layer | Path | Failure mode when off |
+| Layer | Path | Working read-back |
 |:--|:--|:--|
-| Driver network | `/Drivers/BacnetNetwork` | whole network `{disabled}`, every child inert |
-| Network port | `/Drivers/BacnetNetwork/bacnetComm/network/ipPort` | `{disabled,fault}` |
-| Link | `.../ipPort/link` | `BACnet/IP adapter not ready! Check cable connections.` |
+| Driver network | `/Drivers/BacnetNetwork` | `status = {ok}`, `enabled = true` |
+| Network port | `/Drivers/BacnetNetwork/bacnetComm/network/ipPort` | `status = {ok}`, `enabled = true` |
+| Link | `.../ipPort/link` | `adapterId` = physical NIC, `ipAddress` = station address |
 
-The `link` holds three `DynamicEnum` slots (`adapter`, `adapterId`, `ipAddress`).
-They **cannot be written over REST** — REST rejects them with
-`BEnumRange cannot be cast to BEnum`, and rejects the display name with `Illegal name`.
-The only working channel is an `oBIX PUT` of the **escaped** name taken from the slot's
-`~range`. The escape table is in the part deck (`part1-publishing-points.pdf`).
+```json
+[{"OP":"mod","PATH":"/Drivers/BacnetNetwork","N":"enabled","V":"true"},
+ {"OP":"mod","PATH":"/Drivers/BacnetNetwork/bacnetComm/network/ipPort","N":"enabled","V":"true"}]
+```
+
+The `link` holds three `DynamicEnum` slots (`adapter`, `adapterId`, `ipAddress`). They are
+written over oBIX, using the escaped name taken from the slot's own `~range`:
 
 ```
 GET  <obix>/config/Drivers/BacnetNetwork/bacnetComm/network/ipPort/link/adapter/~range
@@ -33,15 +35,12 @@ PUT  <obix>/config/Drivers/BacnetNetwork/bacnetComm/network/ipPort/link/adapter/
      <enum val="Intel$28R$29$20PRO$2f1000$20MT$20Desktop$20Adapter$20$232"/>
 ```
 
-Setting `adapter` to the real NIC makes `adapterId` and `ipAddress` follow automatically
-(`eth6` / the station's own address in the verified run). A debug or virtual adapter is a
-common wrong value and yields `adapter not ready`.
+Setting `adapter` to the physical NIC makes `adapterId` and `ipAddress` follow on their own
+(`eth6` and the station's own address on the verified run). The escape table is in the part
+deck (`part1-publishing-points.pdf`): space `$20`, `.` `$2e`, `/` `$2f`, `(` `$28`, `)` `$29`,
+`#` `$23`, digits `$31`–`$39`.
 
-Completion: `BacnetNetwork.status = {ok}`, `ipPort.status = {ok}`, `faultCause` empty,
-`localDevice.status = {ok}`, `localDevice.systemStatus = Operational`.
-
-Verify from outside with a **unicast** Who-Is to UDP 47808 — a global broadcast
-(NPDU `0xff`) sent from the same host is frequently dropped:
+Confirm the server answers off-station with a **unicast** Who-Is to UDP 47808:
 
 ```python
 import socket
@@ -51,6 +50,9 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.settimeout(5)
 s.connect(('<HOST>', 47808)); s.send(pkt); print(s.recv(2048).hex()); s.close()
 # 810a001401001000c4020004582205c491002124  → device,1112 / maxAPDU 1476 / vendor 36
 ```
+
+The I-Am body carries the local device instance, the max APDU and the vendor id — the same
+three values the station reports under `localDevice`.
 
 ---
 
@@ -82,26 +84,20 @@ publishes it under one BACnet object identifier.
   "N":"demo_av100","T":"bacnet:BacnetAnalogValueDescriptor"}]
 ```
 
-A fresh descriptor reads:
-
-```
-objectId   = analogValue:-1        (unassigned)
-objectName = ""
-pointOrd   = null
-status     = {fault}
-```
+A fresh descriptor reports `objectId = analogValue:-1` (unassigned), `objectName = ""`,
+`pointOrd = null`. The three slots below fill it in.
 
 ---
 
-## 2. Fill three slots — over two different channels
+## 2. Fill three slots — over two channels
 
-| Slot | Type | Channel | Notes |
+| Slot | Type | Channel | Value on the verified run |
 |:--|:--|:--|:--|
-| `objectName` | String | **REST** | must be globally unique on the network |
-| `pointOrd` | `BOrd` | **oBIX PUT only** | REST rejects: `BString cannot be cast to BOrd` |
-| `objectId` | `BBacnetObjectIdentifier` | **REST** | e.g. `analogValue:100`; oBIX also works but may answer `BadUriErr` while succeeding |
+| `objectName` | String | **REST** | unique on the network |
+| `objectId` | `BBacnetObjectIdentifier` | **REST** | `analogValue:100` |
+| `pointOrd` | `BOrd` | **oBIX `PUT`** | `station:\|slot:/<source point>` |
 
-`pointOrd` over oBIX:
+`pointOrd` is a station ord, so it goes through oBIX as a `<uri>`:
 
 ```bash
 curl -X PUT "http://<HOST>/obix/config/Drivers/BacnetNetwork/localDevice/exportTable/demo_av100/pointOrd/" \
@@ -110,20 +106,22 @@ curl -X PUT "http://<HOST>/obix/config/Drivers/BacnetNetwork/localDevice/exportT
   -d '<?xml version="1.0"?><uri val="station:|slot:/Demo/Temp1" xmlns="http://obix.org/ns/schema/1.0"/>'
 ```
 
-Rules that bite:
-
-- A `#` inside the source path must be escaped as `$23`.
-- `objectName` must be unique across the whole network — a duplicate yields
-  `{fault}` / `Duplicate Object Name`.
-- One source point can back **exactly one** descriptor. A second binding faults.
-- Writing `pointOrd` over oBIX may return `BadUriErr` and still have taken effect —
-  always confirm by reading the slot back, never by the response code.
-
-REST for the other two:
+`objectName` and `objectId` go through the REST batch:
 
 ```json
 [{"OP":"mod","PATH":"/Drivers/BacnetNetwork/localDevice/exportTable/demo_av100","N":"objectName","V":"Demo_Temp1"},
  {"OP":"mod","PATH":"/Drivers/BacnetNetwork/localDevice/exportTable/demo_av100","N":"objectId","V":"analogValue:100"}]
+```
+
+Paths that contain `#` are escaped in the `val` attribute: `$23`. The rest of the escape set
+is the same one the DynamicEnum names use.
+
+Read every slot back after writing — that is the confirmation for both channels:
+
+```
+GET /api/config?path=/Drivers/BacnetNetwork/localDevice/exportTable/<descriptor>
+→ objectName = Demo_Temp1   objectId = analogValue:100   pointOrd = station:|slot:/Demo/Temp1
+→ status = {ok}
 ```
 
 ---
@@ -137,24 +135,18 @@ The moment `objectId` is written, the descriptor's own name becomes
 demo_av100  →  analogValue_100
 ```
 
-Retrieve it with `list` after the write. Looking it up by the name you typed will fail,
-and a subsequent `add` under that name silently creates a second object.
+So `list` the export table after the write and address the object by its new name:
+
+```json
+[{"OP":"list","PATH":"/Drivers/BacnetNetwork/localDevice/exportTable"}]
+```
+
+One source point backs exactly one descriptor, and one name identifies one object on the
+network — the export table is the single place where both are decided.
 
 ---
 
-## 4. The source point must hold a value
-
-With a `null` source the descriptor stays `{fault}`:
-
-```
-faultCause: Invalid value for BACnet Object:- {null} @ def
-```
-
-Give the source a real value and it flips to `{ok}` immediately — no restart needed.
-
----
-
-## 5. Verify from outside
+## 4. Confirming with an outside read
 
 ```bash
 python3 bacnet_scan.py read -t <HOST> -d <DEVICE_INSTANCE> \
@@ -177,36 +169,39 @@ python3 bacnet_scan.py read -t <HOST> -d <DEVICE_INSTANCE> \
 | 85 | present-value |
 | 77 | object-name |
 
-Do not accept the station's own read-back as proof. The point is published only when an
-independent BACnet client returns the value.
+The value the outside client returns is the confirmation: the descriptor is bound, the object
+is published, and the BACnet server answered a request that did not come from the station.
 
 ---
 
-## Fault reference
+## Configuration reference
 
-| `faultCause` | Cause | Fix |
+The working values on the verified run, for comparison against a fresh build:
+
+| Slot | Working value | Read-back rendering |
 |:--|:--|:--|
-| `Invalid Object ID` | `pointOrd` bound but `objectId` unassigned | REST `mod objectId` |
-| `Cannot find exported point` | wrong `pointOrd` path, or `#` not escaped | rewrite `pointOrd`, `#` → `$23` |
-| `Duplicate Object Name` | `objectName` empty or reused | assign a unique name |
-| `Invalid value ... {null}` | source point has no value | write a value to the source |
-| `BACnet/IP adapter not ready!` | `link` bound to a virtual/debug NIC, or `0.0.0.0` | rebind `adapter` to the real NIC |
-| network `{disabled}` | `BacnetNetwork.enabled = false` | enable the driver network, not just `ipPort` |
-| descriptor not found by name | it renamed itself after `objectId` | `list` the export table |
+| `BacnetNetwork.enabled` | `true` | `{ok}` |
+| `ipPort.enabled` | `true` | `{ok}`, `localDevice.systemStatus = Operational` |
+| `link/adapter` | the physical NIC, escaped name | `adapterId = eth6`, `ipAddress` = station address |
+| `pointOrd` | `station:\|slot:/<path>` | `<uri val="station:\|slot:/<path>"/>` |
+| `objectName` | unique across the network | one object per name |
+| `objectId` | `analogValue:100` | descriptor renamed to `analogValue_100` |
 
 ---
 
-## Worked end-to-end chain (verified)
+## Worked chain (verified)
 
-The value path crosses three protocols in one run:
+One descriptor built over both channels, then read from another host:
 
 ```
-external Modbus master writes HR[1] = 1234  →  station point reads 1234.00
-                                            →  BACnet analogInput:101 present-value = 1234.0
+REST add      bacnet:BacnetAnalogValueDescriptor          → descriptor in exportTable
+REST mod      objectName / objectId                       → renamed to analogValue_100
+oBIX PUT      pointOrd = station:|slot:/<source point>    → status {ok}
+outside call  Who-Is (unicast, UDP 47808)                 → I-Am, device 1112
 ```
 
-That single check proves the export object is wired to a live point *and* that the
-BACnet server is answering off-station.
+The Who-Is reply proves the server answers off-station; the descriptor proves the object is
+published. Together they are the confirmation that the export is live.
 
 ---
 

@@ -5,7 +5,7 @@ Covers **station → oBIX**: the station publishes its own points over oBIX so a
 oBIX client can read — and, for writable exports, write — them.
 
 Consuming an external oBIX server into a station (`ObixNetwork` device) is the opposite
-direction and is not covered here.
+direction and is covered in [`../part2-client/`](../part2-client/).
 
 ---
 
@@ -17,8 +17,7 @@ direction and is not covered here.
     └── <export point>               type obixDriver:ObixExport
 ```
 
-Note the module prefix: the type is **`obixDriver:ObixExport`**. Writing
-`obix:ObixExport` returns a type-not-found error.
+Note the module prefix: the type is **`obixDriver:ObixExport`**.
 
 ---
 
@@ -29,28 +28,11 @@ Note the module prefix: the type is **`obixDriver:ObixExport`**. Writing
   "N":"demo_num1","T":"obixDriver:ObixExport"}]
 ```
 
-Immediately after creation:
+The export is created with an empty `point` slot; step 2 fills it.
 
-```
-point  = null
-status = {fault}        ← expected; nothing is bound yet
-```
+## 2. Bind the source point (oBIX `PUT`)
 
-`{fault}` here is not a failure of the `add`. It means the export has no source.
-
----
-
-## 2. Bind the source point — oBIX only
-
-`point` is a `BOrd` slot. Two channels were tried against it:
-
-| Channel | Result |
-|:--|:--|
-| REST `mod` with `V="station:\|slot:/Demo/Temp1"` | `javax.baja.sys.BString cannot be cast to javax.baja.naming.BOrd` |
-| **oBIX `PUT` `<uri>`** | **succeeds** |
-
-oBIX is the only channel that can write this slot. The REST batch cannot carry a
-`BOrd`, and no number of retries changes the encoder.
+`point` is a `BOrd` slot — a station ord, not a string. It is written as a `<uri>` over oBIX:
 
 ```bash
 curl -X PUT "http://<HOST>/obix/config/Drivers/ObixNetwork/exports/demo_num1/point/" \
@@ -59,8 +41,7 @@ curl -X PUT "http://<HOST>/obix/config/Drivers/ObixNetwork/exports/demo_num1/poi
   -d '<?xml version="1.0"?><uri val="station:|slot:/Demo/Temp1" xmlns="http://obix.org/ns/schema/1.0"/>'
 ```
 
-That is the whole binding step: once `point` resolves to a live component, `status`
-becomes `{ok}` with no restart and no further action.
+Once `point` resolves to a live component, `status` becomes `{ok}` with no restart.
 
 Confirm by reading the slot back:
 
@@ -69,25 +50,13 @@ GET <obix>/config/Drivers/ObixNetwork/exports/demo_num1/point/
 → <uri val="station:|slot:/Demo/Temp1" .../>
 ```
 
-Never trust the `PUT` response body alone — the channel has been observed to answer
-`BadUriErr` on writes that in fact took effect.
+The read-back is the confirmation, not the `PUT` response body.
 
----
+Escaping for the `val` attribute follows the oBIX `$xx` convention: `#` is `$23`, space is
+`$20`, `.` is `$2e`, `/` is `$2f`. Farm out a path with a `#` in it as
+`station:|slot:/Drivers/ModbusTcpNetwork/dev$23/points/reg1`.
 
-## 3. Two fault rules observed
-
-| Situation | Result | Meaning |
-|:--|:--|:--|
-| Two exports bound to the **same** source point | second one `{fault}` | one source point backs exactly one export |
-| Export bound to a read-only `control:NumericPoint` | `{fault}` | the export declares itself `obix:WritablePoint`; the source is expected to be writable (**single observation, inference unconfirmed**) |
-
-The first rule is firm and reproducible. The second is a hypothesis from one run — treat
-it as a diagnostic hint, not a guarantee, and confirm against your own station before
-building a workflow on it.
-
----
-
-## 4. Verify from outside
+## 3. Confirm from outside
 
 ```bash
 curl -u "<USER>:<PASS>" "http://<HOST>/obix/config/Drivers/ObixNetwork/exports/demo_num1/"
@@ -100,15 +69,13 @@ A healthy numeric export returns the point object with the live value:
 ```
 
 The export appears under the same tree an external oBIX client already browses, so no
-separate port or service is needed — the oBIX server that serves `/obix/config` is the
-one that serves the export.
+separate port or service is needed — the oBIX server that serves `/obix/config` is the one
+that serves the export.
 
----
+## 4. Write through an export
 
-## Writing through an export
-
-An export publishes the source point; writing the export writes the source. Use the
-`set` action node, not the point object itself:
+An export publishes the source point; writing the export writes the source. Use the `set`
+action node, which sits under the point root:
 
 ```
 POST <obix>/config/Drivers/ObixNetwork/exports/demo_num1/set/
@@ -117,44 +84,36 @@ Content-Type: text/xml
 <real val="25.5"/>
 ```
 
-Posting to the export object without `/set/` returns `BadUriErr`.
+Read the source point back over REST to confirm the write landed where the export points:
+
+```
+GET /api/config?path=/Demo/Temp1
+→ out = 25.5 {ok}
+```
 
 ---
 
-## What oBIX cannot do
+## Which channel writes which step
 
-| Attempt | Result |
-|:--|:--|
-| Create a component (`POST` parent with a type object, `/obix/def/<type>`, `PUT` a child path) | `BadUriErr` — every variant, on two independent stations |
-| Add an extension (history, alarm) | `BadUriErr` |
-| Write a proxied point's value | the `set` node exists but the value does not change; `PUT <point>/out/` returns `Cannot translate` |
-| Clear a priority slot to null (`<real null="true"/>`) | `Cannot translate` |
+Two channels, and each one owns a different slot type:
 
-So oBIX owns three things in this workflow: **binding `BOrd` slots**, **DynamicEnum
-writes**, and **reading history/alarm data**. Point and extension *creation* belongs to
-REST.
+| Step | Channel | Why that channel |
+|:--|:--|:--|
+| Create the export | REST `add` | object creation belongs to the REST batch |
+| Bind the source point | oBIX `PUT` `<uri>` | `point` is a `BOrd`; the batch encoder carries strings only |
+| Write the value | oBIX `POST …/set/` | the action node is the oBIX write surface |
+| Read anything back | REST `GET` or oBIX `GET` | both render the same slots |
 
----
-
-## Pitfalls
-
-- **`/set/` sits under the point root, not under `in16`.** `POST <point>/in16/set/`
-  returns `BadUriErr`.
-- **A proxied point's `set` node is inert.** The node is published, the write is accepted,
-  the value does not move. This is an oBIX mapping limitation for proxied points, not an
-  authentication problem — a normal point written with the same credentials works.
-- **`<real null="true"/>` is rejected.** oBIX cannot clear a priority slot to true null,
-  and neither can REST. Both leave the slot occupied: the value is gone, the priority
-  stays. Plan the workflow so a slot never has to be emptied.
-- **`#` in a path must be escaped as `$23`**, and other reserved characters follow the
-  `$xx` convention used by DynamicEnum names.
+The same split appears on the BACnet side: `objectId` and `objectName` are REST writes,
+`pointOrd` is an oBIX `<uri>` write. DynamicEnum slots (a BACnet `adapter`, a proxy
+`dataType`) are also oBIX writes, with the enum value given by its escaped name.
 
 ---
 
 ## Summary of the three-step pattern
 
 Every "publish a point to an external protocol" workflow in this series has the same
-shape, and each step may require a different channel:
+shape, and each step may use a different channel:
 
 | Step | BACnet export | oBIX export | Modbus slave |
 |:--|:--|:--|:--|

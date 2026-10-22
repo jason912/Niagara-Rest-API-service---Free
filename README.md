@@ -346,6 +346,7 @@ HTTP with no license fee — and pairs with oBIX for alarms and history.
 | [v2 What's New](docs/v2/glineRestApi-v2-whatsnew.pdf) | What v2 adds over v1 |
 | [v2 Test Report](docs/v2/glineRestApi-v2-Test-Report.md) | v2 — 40/40 use cases passed |
 | [AI automation lab](niagara-ai-lab/README.md) | Driving a station through the API only — split into [Part 1: publishing points](niagara-ai-lab/part1-server/) (BACnet / oBIX / Modbus servers) and [Part 2: collecting points](niagara-ai-lab/part2-client/) (clients, proxy extensions, proof of collection) |
+| [Lab checklist](niagara-ai-lab/VERIFIED.md) | Which capabilities were built over the API and confirmed off-station — ticked, with the rest left blank |
 | [CHANGELOG](CHANGELOG.md) | What each v2 version adds (v2.0 → v2.4.0) |
 
 ---

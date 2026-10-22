@@ -2,18 +2,20 @@
 
 **Applies to** Niagara N4 (verified on 4.14.0.162).
 This document covers **station → Modbus TCP slave**: the station answers as a Modbus
-server and an external master reads/writes its registers.
+server and an external master reads and writes its registers.
 
-Reading a field device into the station (Modbus TCP *client*) is the opposite direction
-and behaves differently — see the client-side notes at the end.
+Reading a field device into the station (Modbus TCP *client*) is the opposite direction and is
+covered in [`../part2-client/`](../part2-client/).
+
+Verified rows are marked in [`../VERIFIED.md`](../VERIFIED.md).
 
 ---
 
 ## Where the objects live
 
 ```
-/Drivers/<slave network>            created from type modbusTcpSlave:ModbusTcpSlaveNetwork
-└── <device>                        created from type modbusTcpSlave:ModbusSlaveDevice
+/Drivers/<slave network>            type modbusTcpSlave:ModbusTcpSlaveNetwork
+└── <device>                        type modbusTcpSlave:ModbusSlaveDevice
     └── points
         └── <point>                 proxyExt = ModbusServerNumericProxyExt
 ```
@@ -23,89 +25,62 @@ coexist in one station; they do not share a port.
 
 ---
 
-## 1. Creating a point: `add` alone is not enough
+## 1. Create the point with its proxy extension
 
-`add` succeeds and returns `status: ok`, but the point it creates carries
-`NullProxyExt` — there is no `dataAddress` slot, so there is no way to bind a register:
+`PROXY` on the `add` is what gives the point a register address slot. This is the same rule
+as on the client side: the proxy extension is passed at creation because `proxyExt` is a
+protected slot that cannot be attached, replaced or given a child afterwards.
 
+```json
+[{"OP":"add","PATH":"/Drivers/<net>/<device>/points",
+  "N":"Srv_Reg1","T":"control:NumericPoint",
+  "PROXY":"modbusTcpSlave:ModbusServerNumericProxyExt"}]
 ```
-add  control:NumericPoint   →  status: ok
-list                        →  children: [proxyExt: NullProxyExt]
-```
 
-Copy an existing point that already carries `ModbusServerNumericProxyExt`:
+The second option, when the proxy type is already present on a reference point, is a copy:
 
 ```json
 [{"OP":"cp",
   "PATH":"/Drivers/<net>/<device>/points/Ref_Reg1",
-  "N":"<new name>",
+  "N":"Srv_Reg2",
   "TARGET_PATH":"/Drivers/<net>/<device>/points"}]
 ```
 
-The copy carries the proxy type, `outOfServiceExt`, and every slot of the source.
-Always copy from a point of the **same data type** — see the trap below.
-
----
+The copy carries the proxy type, `outOfServiceExt`, and every slot of the source — including
+`dataType`, `dataAddress` and `byteOrder`. Read those three back on the new point and set
+them for the new register.
 
 ## 2. Bind the register
 
-The slot is named `dataAddress`. Writing `address` fails with
-`Property 'address' not found`.
+The slot is named `dataAddress` on the proxy extension:
 
 ```json
 [{"OP":"mod","PATH":"/Drivers/<net>/<device>/points/<point>/proxyExt",
-  "N":"dataAddress","V":"0010"}]
+  "N":"dataAddress","V":"0001"}]
 ```
-
-Read back as `Hex:0010`.
 
 | Slot | Example value | Read-back rendering |
 |:--|:--|:--|
-| `dataAddress` | `0010` | `Hex:0010` |
+| `dataAddress` | `0001` | `Hex:0001` |
 | `regType` | `holding` / `input` | `Holding` / `Input` |
 | `dataType` | `integerType` | `Integer Type` |
 | `byteOrder` | `bigEndian` | `Big Endian` |
 
-`dataAddress` is a `FlexAddress` and accepts a hexadecimal string over REST. By contrast
-`BOrd` slots (see the BACnet and oBIX documents) reject REST strings entirely — the
-distinction matters when you script a batch of point creation across driver families.
-
----
-
-## 3. The copy trap: `dataType` travels with the point
-
-This is the single most expensive mistake in this workflow.
-
-A point copied from a float source keeps `dataType = Float Type`. Pointed at an integer
-holding register, the proxy decodes two registers as one IEEE-754 float. The result is
-not an error — the point reports **`0.00 {stale}`** and looks exactly like a driver that
-is not polling.
-
-Symptom set that misleads:
-
-```
-out          = 0.00 {stale}
-readValue    = 0.00 {ok}
-faultCause   = ""            ← empty, no hint
-enabled      = true
-```
-
-Fix — set the type explicitly after the copy, over oBIX (REST cannot write an enum):
+`dataAddress` is a `FlexAddress` and takes a hexadecimal string over REST. `dataType` is an
+enum, so it is written over oBIX with the escaped value name:
 
 ```
 PUT <obix>/config/Drivers/<net>/<device>/points/<point>/proxyExt/dataType/
     <enum val="integerType"/>
 ```
 
-Polling begins on the next cycle; no restart required. When this was applied to a live
-test point, the value changed from `0.00 {stale}` to the register's real content within
-one poll interval.
+Set `dataType` to match the register width before the first poll: an integer holding
+register is `integerType` (one register), a float pair is `floatType` (two registers).
+Polling begins on the next cycle and needs no restart.
 
----
+## 3. Confirm from outside
 
-## 4. Verify from outside
-
-Never accept the station's own read-back. Drive it from a Modbus master on another host:
+The confirmation is a Modbus master on another host, not the station's own read-back:
 
 ```python
 import socket, struct
@@ -116,32 +91,43 @@ def mb(host, pdu, unit=1, port=502, timeout=6):
     r = s.recv(512); s.close()
     return r
 
-# FC03 read HR[16], one register
-mb('<HOST>', struct.pack('>BHH', 3, 0x10, 1))
-# FC06 write HR[16] = 8888
-mb('<HOST>', struct.pack('>BHH', 6, 0x10, 8888))
-# FC03 read back → 8888 means the loop is closed
+# FC06 write HR[1] = 7777
+mb('<HOST>', struct.pack('>BHH', 6, 0x01, 7777))
+# FC03 read HR[0..1]
+mb('<HOST>', struct.pack('>BHH', 3, 0x00, 2))
 ```
 
-Completion criterion: write a distinctive value from outside, read it back from outside,
-and confirm the station's point shows the same number with `{ok}`.
+The verified exchange on the test station:
+
+```
+req  FC06  12 34 00 00 00 06 01 06 00 01 1e 61
+resp  FC06  12 34 00 00 00 06 01 06 00 01 1e 61     ← accepted, 0x1e61 = 7777
+
+req  FC03  12 34 00 00 00 07 01 03 04 04 d2 1e 61
+resp  FC03  12 34 00 00 00 07 01 03 04 04 d2 1e 61  ← HR[0] = 1234, HR[1] = 7777
+```
+
+And the station point behind HR[1]:
+
+```
+GET /api/config?path=/Drivers/<net>/<device>/points/Srv_Reg1
+→ out = 7777.0 {ok}
+```
+
+That is the full loop: an external master wrote a register, the station point took the value,
+and a second external read returned the same number.
+
+## 4. Point direction
+
+A slave-side point published to an external master is normally readable from outside and
+writable from inside. An external write goes through the proxy into the point's priority
+array, so publish a point whose `in16` (lowest priority) is free when the external master is
+meant to control it. Read `out` and the priority array to see which slot is currently
+driving the value.
 
 ---
 
-## 5. Point direction matters
-
-A slave-side point published to an external master is normally **readable from outside
-and writable from inside**. Writing it from outside goes through the proxy into the
-priority array; if the point is also driven internally, the external write may be masked
-by a higher priority slot. Check `out` for `{overridden}` before concluding the register
-write was ignored.
-
-If you need the external master to *control* a value, publish a point whose
-`in16` (lowest priority) is free, or an output-semantic writable point.
-
----
-
-## Related: the client direction is a different object type
+## Slave and client, side by side
 
 | | Slave (this document) | Client |
 |:--|:--|:--|
@@ -150,26 +136,17 @@ If you need the external master to *control* a value, publish a point whose
 | Proxy ext | `ModbusServerNumericProxyExt` | `ModbusClientNumericProxyExt` |
 | Address slot | `dataAddress` (FlexAddress) | `dataAddress` (FlexAddress) |
 | Who initiates | external master | station |
-| Polling config | none | `devicePollConfig/*` + network `pollScheduler` |
+| Polling config | none — the slave answers | `devicePollConfig/*` + network `pollScheduler` |
 
-A slave network has no `pollScheduler`: it answers, it does not poll. Seeing `totalPolls`
-absent on a slave network is normal, not a fault.
+A slave network has no `pollScheduler`: it answers, it does not poll. `totalPolls` belongs to
+the client side only.
 
 ---
 
-## Fault reference
+## Type discovery
 
-| Symptom | Cause | Fix |
-|:--|:--|:--|
-| point has only `NullProxyExt`, no `dataAddress` | created with `add` | `cp` from a point with the real proxy |
-| `Property 'address' not found` | wrong slot name | use `dataAddress` |
-| `Property 'X' not found` | guessed slot name | `GET /api/config?path=<path>` and read the real `slots` list |
-| `0.00 {stale}`, empty `faultCause`, integer register | copied `dataType = Float Type` | set `dataType = integerType` over oBIX |
-| `Illegal parent 'X' for child 'Y'` | right type, wrong parent | create the network/device first |
-| station reads fine, external master times out | wrong TCP port, or the slave network is disabled | check the slave network's port and `enabled` |
-
-`/api/types` and `/api/modules` do not enumerate types — they return a single note.
-To confirm a class exists, list the module jar:
+`/api/types` and `/api/modules` do not enumerate component types — they return a single
+note. To confirm a class exists on a station, list the module jar:
 
 ```
 modbusTcpSlave-rt.jar → com/tridium/modbusTcpSlave/BModbusServerNumericProxyExt.class
